@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('turno_cajas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('negocio_id')->constrained('negocios')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users');
             $table->decimal('monto_apertura', 10, 2);
             $table->decimal('monto_cierre', 10, 2)->nullable();

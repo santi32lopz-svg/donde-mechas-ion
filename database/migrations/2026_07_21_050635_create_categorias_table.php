@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('categorias', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('negocio_id')->constrained('negocios')->onDelete('cascade');
             $table->string('nombre');
             $table->integer('orden_visualizacion')->default(0);
             $table->boolean('activo')->default(true);

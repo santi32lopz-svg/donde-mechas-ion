@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('insumos', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('negocio_id')->constrained('negocios')->onDelete('cascade');
             $table->string('nombre');
             $table->string('unidad_medida'); // Ej: gramos, unidades, mililitros
             $table->decimal('stock_actual', 10, 2)->default(0);

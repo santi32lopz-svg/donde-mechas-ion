@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('negocio_id')->constrained('negocios')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users');
             $table->string('numero_pedido')->unique();
             $table->enum('estado', ['pendiente', 'completado', 'cancelado'])->default('completado');
