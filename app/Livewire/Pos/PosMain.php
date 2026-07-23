@@ -4,6 +4,7 @@ namespace App\Livewire\Pos;
 
 use Livewire\Component;
 use App\Models\Producto;
+use App\Models\Categoria;
 
 class PosMain extends Component
 {
@@ -125,16 +126,33 @@ class PosMain extends Component
         $this->calculateTotals();
     }
 
+    /**
+     * Helper para seleccionar/deseleccionar categoría
+     */
+    public function selectCategoria(?int $categoriaId = null): void
+    {
+        // Si presiona la misma categoría que ya está activa, la quitamos (desfiltrar)
+        if ($this->selectedCategoriaId === $categoriaId) {
+            $this->selectedCategoriaId = null;
+        } else {
+            $this->selectedCategoriaId = $categoriaId;
+        }
+    }
+
     public function render()
     {
-        // Consulta de productos activa según búsqueda y categoría activa
+        // Cargar todas las categorías activas (puedes filtrar por negocio_id si aplica)
+        $categorias = Categoria::all();
+
+        // Consulta de productos filtrada por término de búsqueda Y/O categoría seleccionada
         $productos = Producto::query()
             ->when($this->search, fn($q) => $q->where('nombre', 'like', "%{$this->search}%"))
             ->when($this->selectedCategoriaId, fn($q) => $q->where('categoria_id', $this->selectedCategoriaId))
             ->get();
 
         return view('livewire.pos.pos-main', [
-            'productos' => $productos,
+            'productos'  => $productos,
+            'categorias' => $categorias,
         ])->layout('layouts.app');
     }
 }

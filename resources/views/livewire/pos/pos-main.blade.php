@@ -11,9 +11,7 @@
                     <!-- Buscador -->
                     <div class="mb-3">
                         <div class="input-group input-group-lg">
-                            <span class="input-group-text bg-dark border-0 text-white-50">
-                                🔍
-                            </span>
+                            <span class="input-group-text bg-dark border-0 text-white-50">🔍</span>
                             <input 
                                 type="text" 
                                 wire:model.live.debounce.300ms="search" 
@@ -24,6 +22,29 @@
                                 <button class="btn btn-dark text-white-50" wire:click="$set('search', '')">✕</button>
                             @endif
                         </div>
+                    </div>
+
+                    <!-- Barra de Filtro por Categorías -->
+                    <div class="mb-3 d-flex gap-2 overflow-x-auto pb-2" style="white-space: nowrap;">
+                        <!-- Botón Todas -->
+                        <button 
+                            type="button"
+                            wire:click="selectCategoria(null)"
+                            class="btn btn-sm px-3 rounded-pill fw-bold {{ is_null($selectedCategoriaId) ? 'btn-warning text-dark' : 'btn-outline-light' }}"
+                        >
+                            Todos
+                        </button>
+
+                        <!-- Botones de Categorías Dinámicas -->
+                        @foreach($categorias as $categoria)
+                            <button 
+                                type="button"
+                                wire:click="selectCategoria({{ $categoria->id }})"
+                                class="btn btn-sm px-3 rounded-pill fw-bold {{ $selectedCategoriaId === $categoria->id ? 'btn-warning text-dark' : 'btn-outline-light' }}"
+                            >
+                                {{ $categoria->nombre }}
+                            </button>
+                        @endforeach
                     </div>
 
                     <!-- Grilla de Productos -->
