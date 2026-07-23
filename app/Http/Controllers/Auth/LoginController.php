@@ -20,19 +20,23 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
+        // Intentamos autenticar al usuario con las credenciales proporcionadas
+        if (Auth::attempt(
+            $credentials, 
+            $request->boolean('remember') // Permite recordar al usuario si se selecciona la opción "remember me"
+            )) {
+            $request->session()->regenerate(); // Regeneramos la sesión para prevenir ataques de fijación de sesión
 
-            $user = Auth::user();
+            $user = Auth::user(); // Obtenemos el usuario autenticado
 
-            // Verificación Multi-Tenant: Validar que el negocio del usuario esté activo
-            if (!$user->negocio || !$user->negocio->activo) {
+            // Verificación Multi-Tenant: Validar que el negocio del usuario exista y esté activo
+            if (!$user->negocio || $user->negocio->estado_suscripcion !== 'activo') {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
 
                 return back()->withErrors([
-                    'email' => 'El negocio asociado a esta cuenta se encuentra inactivo o no existe.',
+                    'email' => 'El negocio asociado a esta cuenta no está activo o no existe.',
                 ]);
             }
 

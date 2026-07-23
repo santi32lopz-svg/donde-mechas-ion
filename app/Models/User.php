@@ -18,6 +18,11 @@ class User extends Authenticatable
 
     protected $guarded = [];
 
+    public function negocio()
+    {
+        return $this->belongsTo(Negocio::class, 'negocio_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *
