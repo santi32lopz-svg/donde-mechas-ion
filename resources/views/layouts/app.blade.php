@@ -58,6 +58,34 @@
         transform: scale(0.96);
     }
 
+    /* Botón de Login Destacado con Alto Impacto Visual */
+    .btn-touch-primary {
+        background: linear-gradient(135deg, #ff3838 0%, #c0392b 100%) !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 16px 24px !important;
+        font-size: 1.15rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        box-shadow: 0 4px 15px rgba(255, 56, 56, 0.4) !important;
+        transition: all 0.2s ease-in-out !important;
+    }
+
+    /* Efectos Táctiles / Hover */
+    .btn-touch-primary:hover, 
+    .btn-touch-primary:focus {
+        background: linear-gradient(135deg, #ff4d4d 0%, #d63031 100%) !important;
+        box-shadow: 0 6px 20px rgba(255, 56, 56, 0.6) !important;
+        transform: translateY(-2px);
+    }
+
+    .btn-touch-primary:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 8px rgba(255, 56, 56, 0.3) !important;
+    }
+
     /* Categorías y Productos (Tiles) */
     .tile-category {
         background-color: var(--brand-surface);
@@ -193,7 +221,7 @@
 
 <!-- CONTENIDO PRINCIPAL (POS CORE WORKSPACE) -->
 <main class="flex-grow-1 overflow-hidden">
-    {{ $slot }}
+    @yield('content')
 </main>
 
 <!-- Bootstrap 5.3 JS Bundle -->

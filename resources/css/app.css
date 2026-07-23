@@ -1,9 +1,233 @@
-@import 'tailwindcss';
+/* ==========================================
+   SISTEMA DE DISEÑO POS SAAS - DARK TOUCH
+   ========================================== */
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+:root {
+    /* 1. PALETA DE COLORES BASE (Tono Oscuro Profesional) */
+    --pos-bg-main: #121417;          /* Fondo principal de la app */
+    --pos-bg-card: #1e2227;          /* Fondo de tarjetas y paneles */
+    --pos-bg-surface: #282c34;       /* Capas secundarias o inputs */
+    --pos-border-color: #323842;    /* Bordes sutiles de separación */
+    
+    /* 2. COLORES ACCIÓN Y ESTADOS */
+    --pos-primary: #ff6b00;          /* Naranja vibrante para acciones principales / cobro */
+    --pos-primary-hover: #e05e00;
+    --pos-secondary: #00b4d8;        /* Azul cyán para elementos de apoyo / filtros */
+    --pos-success: #00e676;          /* Verde para confirmar pedidos / items pagados */
+    --pos-danger: #ff3838;           /* Rojo para anulaciones / alertas */
+    --pos-warning: #ffb300;          /* Amarillo/Naranja para items en espera/cocina */
+    
+    /* 3. TIPOGRAFÍA Y TEXTO */
+    --pos-text-main: #f8f9fa;        /* Texto principal (alto contraste) */
+    --pos-text-muted: #a0aec0;       /* Texto secundario o leyendas */
+    
+    /* 4. MEDIDAS Y ERGONOMÍA TÁCTIL */
+    --touch-btn-height: 54px;        /* Altura mínima estándar para botones ergonómicos */
+    --touch-card-min-height: 110px;  /* Altura mínima para tarjetas de producto */
+    --radius-touch: 12px;            /* Esquinas redondeadas y amigables al tacto */
+}
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/* Base General */
+body {
+    background-color: var(--pos-bg-main);
+    color: var(--pos-text-main);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    user-select: none; /* Evita selección accidental de texto al tocar la pantalla repetidamente */
+    -webkit-user-select: none;
+}
+
+/* ==========================================
+   COMPONENTES REUTILIZABLES (TOUCH COMPONENTES)
+   ========================================== */
+
+/* 1. Tarjeta de Producto Táctil (Grid POS) */
+.pos-card-product {
+    background-color: var(--pos-bg-card);
+    border: 1px solid var(--pos-border-color);
+    border-radius: var(--radius-touch);
+    min-height: var(--touch-card-min-height);
+    transition: transform 0.1s ease, border-color 0.15s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px;
+}
+
+.pos-card-product:active {
+    transform: scale(0.96); /* Feedback visual inmediato al tocar */
+    border-color: var(--pos-primary);
+    background-color: var(--pos-bg-surface);
+}
+
+.pos-product-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--pos-text-main);
+}
+
+.pos-product-price {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--pos-primary);
+}
+
+/* 2. Botones de Acción Táctil */
+.btn-touch {
+    min-height: var(--touch-btn-height);
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-radius: var(--radius-touch);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-touch-primary {
+    background-color: var(--pos-primary);
+    color: #ffffff;
+    border: none;
+}
+.btn-touch-primary:active {
+    background-color: var(--pos-primary-hover);
+}
+
+.btn-touch-success {
+    background-color: var(--pos-success);
+    color: #000000;
+    border: none;
+}
+
+.btn-touch-danger {
+    background-color: var(--pos-danger);
+    color: #ffffff;
+    border: none;
+}
+
+/* 3. Panel de la Tirilla de Venta / Pedido (Lateral) */
+.pos-ticket-panel {
+    background-color: var(--pos-bg-card);
+    border-left: 1px solid var(--pos-border-color);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.pos-ticket-header {
+    background-color: var(--pos-bg-surface);
+    border-bottom: 1px solid var(--pos-border-color);
+    padding: 15px;
+}
+
+.pos-ticket-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.pos-ticket-footer {
+    background-color: var(--pos-bg-surface);
+    border-top: 1px solid var(--pos-border-color);
+    padding: 15px;
+}
+
+/* 4. Ítem dentro de la Tirilla */
+.pos-ticket-item {
+    background-color: var(--pos-bg-main);
+    border: 1px solid var(--pos-border-color);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+}
+
+/* 5. Scrollbar Oscuro Estilizado */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--pos-bg-main);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--pos-border-color);
+    border-radius: 4px;
+}
+
+/* Teclado Numérico Táctil */
+.pos-numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.pos-numpad-btn {
+    height: 60px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    background-color: var(--pos-bg-surface);
+    color: var(--pos-text-main);
+    border: 1px solid var(--pos-border-color);
+    border-radius: var(--radius-touch);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pos-numpad-btn:active {
+    background-color: var(--pos-primary);
+    color: #ffffff;
+}
+
+/* Badges e Indicadores de Estado */
+.badge-status-pending {
+    background-color: rgba(255, 179, 0, 0.2);
+    color: var(--pos-warning);
+    border: 1px solid var(--pos-warning);
+}
+
+.badge-status-completed {
+    background-color: rgba(0, 230, 118, 0.2);
+    color: var(--pos-success);
+    border: 1px solid var(--pos-success);
+}
+
+.badge-status-danger {
+    background-color: rgba(255, 56, 56, 0.2);
+    color: var(--pos-danger);
+    border: 1px solid var(--pos-danger);
+}
+
+/* Botones de Selección de Método de Pago */
+.btn-pay-method {
+    border: 2px solid var(--pos-border-color);
+    background-color: var(--pos-bg-surface);
+    color: var(--pos-text-main);
+    border-radius: var(--radius-touch);
+    padding: 12px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.btn-pay-method.active {
+    border-color: var(--pos-primary);
+    background-color: rgba(255, 107, 0, 0.15);
+    color: var(--pos-primary);
+}
+
+
+/* Form inputs táctiles para Login y Módulos de Administración */
+.form-control-touch, .form-select-touch {
+    background-color: var(--pos-bg-surface) !important;
+    border: 1px solid var(--pos-border-color) !important;
+    color: var(--pos-text-main) !important;
+    min-height: 52px;
+    font-size: 1.1rem;
+    border-radius: var(--radius-touch);
+    padding: 10px 16px;
+}
+
+.form-control-touch:focus, .form-select-touch:focus {
+    border-color: var(--pos-primary) !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 107, 0, 0.25) !important;
 }

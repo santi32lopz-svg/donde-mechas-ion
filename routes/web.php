@@ -1,17 +1,25 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 
+// Redirección inicial
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
-Route::post('/logout', function () {
-    Auth::logout();
+// Rutas de Autenticación
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login'])->name('login.store');
+});
 
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-
-    return redirect('/');
-})->name('logout');
+// Rutas Protegidas (Requieren Login)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    
+    // Panel POS Principal
+    Route::get('/pos', function () {
+        return view('pos.index');
+    })->name('pos.terminal');
+});
