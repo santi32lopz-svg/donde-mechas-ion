@@ -25,7 +25,7 @@
                     </div>
 
                     <!-- Barra de Filtro por Categorías -->
-                    <div class="mb-3 d-flex gap-2 overflow-x-auto pb-2" style="white-space: nowrap;">
+                    <div class="mb-3 d-flex flex-wrap gap-2">
                         <!-- Botón Todas -->
                         <button 
                             type="button"
