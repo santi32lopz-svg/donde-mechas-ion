@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Livewire\Pos\PosMain;
 use Illuminate\Support\Facades\Route;
 
 // Redirección inicial
@@ -19,7 +20,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     
     // Panel POS Principal
-    Route::get('/pos', function () {
-        return view('pos.index');
-    })->name('pos.terminal');
+    Route::get('/pos', PosMain::class)->name('pos.main');
 });

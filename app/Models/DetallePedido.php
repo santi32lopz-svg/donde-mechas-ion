@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class DetallePedido extends Model
 {
-    //
+    protected $guarded = [];
+
+    public function negocio()
+    {
+        return $this->belongsTo(Negocio::class);
+    }
 }
