@@ -46,7 +46,7 @@ class LoginController extends Controller
                 'tenant_nombre' => $user->negocio->nombre,
             ]);
 
-            return redirect()->intended(route('pos.terminal'));
+            return redirect()->intended(route('pos.main'));
         }
 
         return back()->withErrors([

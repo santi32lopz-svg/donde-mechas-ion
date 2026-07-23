@@ -221,7 +221,7 @@
 
 <!-- CONTENIDO PRINCIPAL (POS CORE WORKSPACE) -->
 <main class="flex-grow-1 overflow-hidden">
-    @yield('content')
+    {{ $slot }}
 </main>
 
 <!-- Bootstrap 5.3 JS Bundle -->

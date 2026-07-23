@@ -20,5 +20,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     
     // Panel POS Principal
-    Route::get('/pos', PosMain::class)->name('pos.terminal');
+    Route::get('/pos', PosMain::class)->name('pos.main');
 });

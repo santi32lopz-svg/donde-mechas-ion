@@ -137,6 +137,4 @@ class PosMain extends Component
             'productos' => $productos,
         ])->layout('layouts.app');
     }
-
-
 }

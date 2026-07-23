@@ -27,6 +27,19 @@ class LoginTest extends TestCase
         $this->assertEquals('Donde Mechas', session('tenant_nombre'));
     }
 
+    public function test_user_can_open_pos_page_and_see_order_content(): void
+    {
+        $this->seed(MenuInicialSeeder::class);
+
+        $user = User::query()->where('email', 'admin@dondemechas.com')->firstOrFail();
+
+        $response = $this->actingAs($user)->get('/pos');
+
+        $response->assertOk();
+        $response->assertSee('Pedido Activo');
+        $response->assertSee('Buscar producto por nombre...');
+    }
+
     public function test_user_cannot_login_when_business_is_not_active(): void
     {
         $this->seed(MenuInicialSeeder::class);
