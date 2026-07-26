@@ -12,15 +12,20 @@ class PosMain extends Component
     public array $cart = [];
     public float $subtotal = 0.00;
     public float $total = 0.00;
-    
+
     // Filtros de búsqueda y navegación en el POS
     public string $search = '';
     public ?int $selectedCategoriaId = null;
 
+    // Negocio activo en sesión (Multi-Tenant / Touch POS)
+    public ?int $negocioId = null;
+
     public function mount(): void
     {
-        // Restaurar el carrito de la sesión si el usuario recarga la página
-        $this->cart = session()->get('pos_cart', []);
+        $this->negocioId = auth()->user()->negocio_id;
+
+        // Restaurar el carrito de la sesión (aislado por negocio activo)
+        $this->cart = session()->get('pos_cart_' . $this->negocioId, []);
         $this->calculateTotals();
     }
 
@@ -29,22 +34,21 @@ class PosMain extends Component
      */
     public function addToCart(int $productoId): void
     {
-        // Buscar el producto en la BD
-        $producto = Producto::find($productoId);
+        // Se valida que el producto pertenezca al negocio activo en sesión
+        $producto = Producto::where('id', $productoId)
+            ->where('negocio_id', $this->negocioId)
+            ->first();
 
         if (!$producto) {
-            // Opcional: Lanzar alerta si no se encuentra
             return;
         }
 
         $id = $producto->id;
 
         if (isset($this->cart[$id])) {
-            // Si ya existe, simplemente incrementamos la cantidad
             $this->cart[$id]['cantidad']++;
             $this->cart[$id]['subtotal'] = $this->cart[$id]['cantidad'] * $this->cart[$id]['precio'];
         } else {
-            // Si es un producto nuevo, lo estructuramos en el array
             $this->cart[$id] = [
                 'id'       => $producto->id,
                 'nombre'   => $producto->nombre,
@@ -73,13 +77,11 @@ class PosMain extends Component
             $this->cart[$productoId]['cantidad']--;
         }
 
-        // Si la cantidad llega a cero o menos, lo eliminamos de la orden
         if ($this->cart[$productoId]['cantidad'] <= 0) {
             $this->removeFromCart($productoId);
             return;
         }
 
-        // Recalcular subtotal del ítem
         $this->cart[$productoId]['subtotal'] = $this->cart[$productoId]['cantidad'] * $this->cart[$productoId]['precio'];
 
         $this->syncAndRecalculate();
@@ -102,7 +104,7 @@ class PosMain extends Component
     public function clearCart(): void
     {
         $this->cart = [];
-        session()->forget('pos_cart');
+        session()->forget('pos_cart_' . $this->negocioId);
         $this->calculateTotals();
     }
 
@@ -112,8 +114,6 @@ class PosMain extends Component
     public function calculateTotals(): void
     {
         $this->subtotal = array_sum(array_column($this->cart, 'subtotal'));
-        
-        // De momento el total es igual al subtotal (puedes añadir impuestos aquí si aplica)
         $this->total = $this->subtotal;
     }
 
@@ -122,7 +122,7 @@ class PosMain extends Component
      */
     private function syncAndRecalculate(): void
     {
-        session()->put('pos_cart', $this->cart);
+        session()->put('pos_cart_' . $this->negocioId, $this->cart);
         $this->calculateTotals();
     }
 
@@ -131,7 +131,6 @@ class PosMain extends Component
      */
     public function selectCategoria(?int $categoriaId = null): void
     {
-        // Si presiona la misma categoría que ya está activa, la quitamos (desfiltrar)
         if ($this->selectedCategoriaId === $categoriaId) {
             $this->selectedCategoriaId = null;
         } else {
@@ -141,13 +140,26 @@ class PosMain extends Component
 
     public function render()
     {
-        // Cargar todas las categorías activas (puedes filtrar por negocio_id si aplica)
-        $categorias = Categoria::all();
+        // Categorías ACTIVAS del negocio en sesión, ordenadas para su visualización en tiles
+        $categorias = Categoria::where('negocio_id', $this->negocioId)
+            ->where('activo', true)
+            ->orderBy('orden_visualizacion')
+            ->get();
 
-        // Consulta de productos filtrada por término de búsqueda Y/O categoría seleccionada
+        // Productos del negocio activo. Filtro en tiempo real por nombre o código de barras (Livewire)
+        // y/o por categoría seleccionada.
         $productos = Producto::query()
-            ->when($this->search, fn($q) => $q->where('nombre', 'like', "%{$this->search}%"))
-            ->when($this->selectedCategoriaId, fn($q) => $q->where('categoria_id', $this->selectedCategoriaId))
+            ->where('negocio_id', $this->negocioId)
+            ->where('disponible', true)
+            ->when($this->search, function ($q) {
+                $term = $this->search;
+                $q->where(function ($sub) use ($term) {
+                    $sub->where('nombre', 'like', "%{$term}%")
+                        ->orWhere('codigo_barras', 'like', "%{$term}%");
+                });
+            })
+            ->when($this->selectedCategoriaId, fn ($q) => $q->where('categoria_id', $this->selectedCategoriaId))
+            ->orderBy('nombre')
             ->get();
 
         return view('livewire.pos.pos-main', [
