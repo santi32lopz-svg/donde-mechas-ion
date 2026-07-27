@@ -14,11 +14,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <!-- Estilos Personalizados POS Dark Touch -->
-    <link rel="stylesheet" href="{{ asset('css/appq.css') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @livewireStyles
 </head>
-<body style="background-color: var(--pos-bg-dark, #121212); min-height: 100vh;">
+<body style="min-height: 100vh;">
 
     <!-- Contenido Dinámico de Vistas Invitadas -->
     <main>

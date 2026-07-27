@@ -25,22 +25,63 @@
     --touch-btn-height: 54px;        /* Altura mínima estándar para botones ergonómicos */
     --touch-card-min-height: 110px;  /* Altura mínima para tarjetas de producto */
     --radius-touch: 12px;            /* Esquinas redondeadas y amigables al tacto */
+    --pos-header-height: 65px;       /* Alto de la barra operativa superior (layouts.app) */
+
+    /* 5. CTA PRINCIPAL (Cobro / Login)
+       Fuente única de verdad del degradado del botón primario. La guía de estilos
+       documenta el CTA en rojo; para volver al naranja --pos-primary basta con
+       cambiar estas dos líneas. */
+    --pos-cta-bg: linear-gradient(135deg, #ff3838 0%, #c0392b 100%);
+    --pos-cta-bg-hover: linear-gradient(135deg, #ff4d4d 0%, #d63031 100%);
 }
 
 /* Base General */
 body {
     background-color: var(--pos-bg-main);
     color: var(--pos-text-main);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Rubik', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     user-select: none; /* Evita selección accidental de texto al tocar la pantalla repetidamente */
     -webkit-user-select: none;
+    overflow-x: hidden;
+}
+
+.font-brand {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+}
+
+/* ==========================================
+   BARRA OPERATIVA SUPERIOR (layouts.app)
+   ========================================== */
+.pos-header {
+    background-color: var(--pos-bg-surface);
+    border-bottom: 2px solid var(--pos-border-color);
+    height: var(--pos-header-height);
+    flex: 0 0 var(--pos-header-height);
+    z-index: 1030;
+}
+
+.pos-header-logo {
+    background-color: var(--pos-warning);
+    color: #121417;
+    border-radius: var(--radius-touch);
+    padding: 4px 10px;
+}
+
+.pos-header-chip {
+    background-color: var(--pos-bg-main);
+    border: 1px solid var(--pos-border-color);
+    border-radius: 999px;
+    padding: 6px 14px;
 }
 
 /* ==========================================
    COMPONENTES REUTILIZABLES (TOUCH COMPONENTES)
    ========================================== */
 
-/* 1. Tarjeta de Producto Táctil (Grid POS) */
+/* 1. Tarjeta de Producto Táctil (Grid POS)
+   Se usa sobre <button> para que sea accesible por teclado y por lector de pantalla,
+   de ahí los resets de apariencia nativa. */
 .pos-card-product {
     background-color: var(--pos-bg-card);
     border: 1px solid var(--pos-border-color);
@@ -52,6 +93,17 @@ body {
     flex-direction: column;
     justify-content: space-between;
     padding: 12px;
+    width: 100%;
+    text-align: left;
+    appearance: none;
+    -webkit-appearance: none;
+    font: inherit;
+    color: inherit;
+}
+
+.pos-card-product:focus-visible {
+    outline: 3px solid var(--pos-primary);
+    outline-offset: 2px;
 }
 
 .pos-card-product:active {
@@ -79,19 +131,47 @@ body {
     font-weight: 700;
     font-size: 1.1rem;
     border-radius: var(--radius-touch);
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    transition: transform 0.05s ease, background-color 0.15s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
+.btn-touch:active {
+    transform: scale(0.96);
+}
+
+/* CTA principal (Cobro / Login). Ver --pos-cta-bg en :root. */
 .btn-touch-primary {
-    background-color: var(--pos-primary);
+    background: var(--pos-cta-bg);
     color: #ffffff;
     border: none;
+    padding: 16px 24px;
+    font-size: 1.15rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(255, 56, 56, 0.4);
 }
+
+.btn-touch-primary:hover,
+.btn-touch-primary:focus {
+    background: var(--pos-cta-bg-hover);
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(255, 56, 56, 0.6);
+}
+
 .btn-touch-primary:active {
-    background-color: var(--pos-primary-hover);
+    box-shadow: 0 2px 8px rgba(255, 56, 56, 0.3);
+}
+
+.btn-touch-primary:disabled,
+.btn-touch-primary.disabled {
+    background: var(--pos-bg-surface);
+    color: var(--pos-text-muted);
+    box-shadow: none;
+    opacity: 1;
 }
 
 .btn-touch-success {
@@ -109,10 +189,12 @@ body {
 /* 3. Panel de la Tirilla de Venta / Pedido (Lateral) */
 .pos-ticket-panel {
     background-color: var(--pos-bg-card);
-    border-left: 1px solid var(--pos-border-color);
-    height: 100vh;
+    border: 1px solid var(--pos-border-color);
+    border-radius: var(--radius-touch);
+    height: 100%; /* Lo acota .pos-ticket-col, que ya descuenta el alto del header */
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .pos-ticket-header {
@@ -230,4 +312,203 @@ body {
 .form-control-touch:focus, .form-select-touch:focus {
     border-color: var(--pos-primary) !important;
     box-shadow: 0 0 0 0.25rem rgba(255, 107, 0, 0.25) !important;
+}
+
+.form-control-touch::placeholder {
+    color: var(--pos-text-muted);
+}
+
+/* ==========================================
+   TERMINAL DE VENTA TÁCTIL (livewire.pos.pos-main)
+   Layout 70% catálogo / 30% tirilla.
+   Vive aquí y no dentro del componente Livewire para no reenviarse
+   en cada render (cada tecla del buscador dispara uno).
+   ========================================== */
+.pos-workspace {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    padding: 16px;
+    height: calc(100vh - var(--pos-header-height));
+    background-color: var(--pos-bg-main);
+}
+
+.pos-catalog-col {
+    flex: 0 0 70%;
+    max-width: 70%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Permite que el grid interno haga scroll en vez de desbordar */
+}
+
+.pos-ticket-col {
+    flex: 0 0 30%;
+    max-width: 30%;
+    min-height: 0;
+}
+
+/* ===== Buscador ===== */
+.pos-workspace .input-group-text {
+    background-color: var(--pos-bg-surface);
+    border: 1px solid var(--pos-border-color);
+    border-right: none;
+    border-radius: var(--radius-touch) 0 0 var(--radius-touch);
+}
+
+.pos-workspace .form-control-touch {
+    border-radius: 0 var(--radius-touch) var(--radius-touch) 0 !important;
+}
+
+/* ===== Categorías: tiles táctiles, altura mínima 60px ===== */
+.pos-category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+}
+
+.pos-category-tile {
+    min-height: 60px;
+    background-color: var(--pos-bg-card);
+    border: 2px solid var(--pos-border-color);
+    border-radius: var(--radius-touch);
+    color: var(--pos-text-main);
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8px;
+    transition: all 0.15s ease;
+}
+
+.pos-category-tile:active {
+    transform: scale(0.96);
+}
+
+.pos-category-tile.active {
+    border-color: var(--pos-primary);
+    background-color: rgba(255, 107, 0, 0.15);
+    color: var(--pos-primary);
+}
+
+.pos-category-tile:focus-visible {
+    outline: 3px solid var(--pos-primary);
+    outline-offset: 2px;
+}
+
+/* ===== Cuadrícula de Productos ===== */
+.pos-product-grid-wrapper {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 4px;
+}
+
+.pos-product-grid {
+    /* La guía pide 4 a 6 columnas en escritorio según resolución */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 12px;
+    align-content: start;
+}
+
+.pos-product-image {
+    width: 100%;
+    height: 70px;
+    border-radius: 8px;
+    background-color: var(--pos-bg-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 8px;
+    color: var(--pos-text-muted);
+    font-size: 1.6rem;
+}
+
+.pos-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pos-empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+}
+
+/* ===== Botones de cantidad en la tirilla =====
+   48x48 mínimo por la regla de ergonomía táctil de la guía de estilos. */
+.pos-qty-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    border: 1px solid var(--pos-border-color);
+    background-color: var(--pos-bg-surface);
+    color: var(--pos-text-main);
+    font-weight: 700;
+    font-size: 1.2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+.pos-qty-btn:active {
+    transform: scale(0.94);
+}
+
+.pos-qty-value {
+    min-width: 40px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--pos-text-main);
+}
+
+.pos-qty-btn-danger {
+    background-color: var(--pos-danger);
+    color: #fff;
+    border: none;
+}
+
+/* ===== Responsive: Tablet (768px - 1024px) ===== */
+@media (max-width: 1024px) {
+    .pos-catalog-col,
+    .pos-ticket-col {
+        flex: 0 0 auto;
+        max-width: none;
+    }
+    .pos-catalog-col { flex: 1 1 60%; }
+    .pos-ticket-col { flex: 0 0 320px; } /* Ancho mínimo de tirilla legible */
+    .pos-product-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ===== Responsive: Mobile (< 768px) ===== */
+@media (max-width: 767px) {
+    .pos-workspace {
+        flex-direction: column;
+        padding: 10px;
+        height: auto;
+        min-height: calc(100vh - var(--pos-header-height));
+    }
+    .pos-catalog-col,
+    .pos-ticket-col {
+        max-width: 100%;
+        flex: 1 1 auto;
+    }
+    .pos-product-grid { grid-template-columns: repeat(2, 1fr); }
+    .pos-product-grid-wrapper { overflow-y: visible; }
+    .pos-category-grid {
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(100px, auto);
+        grid-template-columns: none;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+    .pos-category-grid::-webkit-scrollbar { display: none; }
+    .pos-ticket-panel { height: auto; }
 }
