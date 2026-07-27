@@ -37,7 +37,9 @@ class LoginTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Pedido Activo');
-        $response->assertSee('Buscar producto por nombre...');
+        // Se afirma sobre la propiedad enlazada y no sobre el placeholder,
+        // que es texto de interfaz y cambia con cualquier ajuste de copy.
+        $response->assertSee('wire:model.live.debounce.300ms="search"', false);
     }
 
     public function test_user_cannot_login_when_business_is_not_active(): void
