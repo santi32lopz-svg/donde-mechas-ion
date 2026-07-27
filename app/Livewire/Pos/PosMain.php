@@ -151,13 +151,7 @@ class PosMain extends Component
         $productos = Producto::query()
             ->where('negocio_id', $this->negocioId)
             ->where('disponible', true)
-            ->when($this->search, function ($q) {
-                $term = $this->search;
-                $q->where(function ($sub) use ($term) {
-                    $sub->where('nombre', 'like', "%{$term}%")
-                        ->orWhere('codigo_barras', 'like', "%{$term}%");
-                });
-            })
+            ->buscar($this->search)
             ->when($this->selectedCategoriaId, fn ($q) => $q->where('categoria_id', $this->selectedCategoriaId))
             ->orderBy('nombre')
             ->get();
