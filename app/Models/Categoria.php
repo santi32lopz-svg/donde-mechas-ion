@@ -10,7 +10,20 @@ class Categoria extends Model
 {
     use BelongsToNegocio;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'negocio_id',
+        'nombre',
+        'orden_visualizacion',
+        'activo',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'activo' => 'boolean',
+            'orden_visualizacion' => 'integer',
+        ];
+    }
 
     public function productos(): HasMany
     {

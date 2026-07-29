@@ -1,6 +1,19 @@
 /* ==========================================
    SISTEMA DE DISEÑO POS SAAS - DARK TOUCH
-   ========================================== */
+   ==========================================
+
+   Bootstrap, los iconos y las tipografías se empaquetan desde node_modules en
+   lugar de cargarse por CDN: un punto de venta tiene que abrir aunque el local
+   se quede sin internet. Van primero para que todo lo que sigue los pise. */
+
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "@fortawesome/fontawesome-free/css/all.min.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+@import "@fontsource/montserrat/700.css";
+@import "@fontsource/montserrat/800.css";
+@import "@fontsource/rubik/400.css";
+@import "@fontsource/rubik/500.css";
+@import "@fontsource/rubik/700.css";
 
 :root {
     /* 1. PALETA DE COLORES BASE (Tono Oscuro Profesional) */
@@ -487,16 +500,31 @@ body {
     .pos-product-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* ===== Responsive: Mobile (< 768px) ===== */
-@media (max-width: 767px) {
+/* ===== Barra inferior fija (solo móvil) ===== */
+.pos-mobile-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1035; /* Sobre el contenido, bajo el backdrop del offcanvas (1040) */
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    background-color: var(--pos-bg-surface);
+    border-top: 1px solid var(--pos-border-color);
+}
+
+/* ===== Responsive: Mobile (< 768px) =====
+   La tirilla deja de ser columna y pasa a panel inferior desplegable, según
+   la estrategia mobile-first de la guía de estilos. */
+@media (max-width: 767.98px) {
     .pos-workspace {
         flex-direction: column;
         padding: 10px;
         height: auto;
         min-height: calc(100vh - var(--pos-header-height));
+        /* Hueco para que la barra fija no tape el último producto */
+        padding-bottom: 92px;
     }
-    .pos-catalog-col,
-    .pos-ticket-col {
+    .pos-catalog-col {
         max-width: 100%;
         flex: 1 1 auto;
     }
@@ -510,5 +538,21 @@ body {
         scrollbar-width: none;
     }
     .pos-category-grid::-webkit-scrollbar { display: none; }
-    .pos-ticket-panel { height: auto; }
+
+    /* Tirilla como bottom drawer */
+    .pos-ticket-col.offcanvas-md {
+        --bs-offcanvas-height: 85vh;
+        --bs-offcanvas-bg: var(--pos-bg-card);
+        --bs-offcanvas-border-color: var(--pos-border-color);
+        --bs-offcanvas-border-width: 1px;
+        max-width: 100%;
+        border-top-left-radius: var(--radius-touch);
+        border-top-right-radius: var(--radius-touch);
+    }
+
+    .pos-ticket-col .pos-ticket-panel {
+        height: 100%;
+        border: none;
+        border-radius: 0;
+    }
 }

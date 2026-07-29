@@ -10,7 +10,28 @@ class Producto extends Model
 {
     use BelongsToNegocio;
 
-    protected $guarded = [];
+    /**
+     * Lista explícita en lugar de $guarded = [], que dejaba asignable cualquier
+     * columna. negocio_id sigue aquí porque los seeders lo pasan directo; en
+     * peticiones autenticadas lo rellena el trait BelongsToNegocio.
+     */
+    protected $fillable = [
+        'negocio_id',
+        'categoria_id',
+        'nombre',
+        'codigo_barras',
+        'precio',
+        'disponible',
+        'imagen_path',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'precio' => 'decimal:2',
+            'disponible' => 'boolean',
+        ];
+    }
 
     /**
      * Filtra por nombre o código de barras para el buscador del POS.

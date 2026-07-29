@@ -180,6 +180,21 @@ class MenuInicialSeeder extends Seeder
             Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catBebidas->id, 'nombre' => 'Gaseosa Personal 350ml', 'precio' => 4000.00, 'disponible' => true]);
             Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catBebidas->id, 'nombre' => 'Agua Embotellada', 'precio' => 3000.00, 'disponible' => true]);
             Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catBebidas->id, 'nombre' => 'Jugo Natural', 'precio' => 5000.00, 'disponible' => true]);
+
+            // --- CÓDIGOS DE BARRAS ---
+            // La columna se añadió después de escribirse este seeder, así que
+            // todos los productos quedaban en NULL y el lector del POS no tenía
+            // nada que encontrar. Se asigna un código determinista: prefijo 770
+            // (Colombia) más el id del producto.
+            Producto::query()
+                ->where('negocio_id', $negocioId)
+                ->whereNull('codigo_barras')
+                ->get()
+                ->each(function (Producto $producto): void {
+                    $producto->forceFill([
+                        'codigo_barras' => '770'.str_pad((string) $producto->id, 10, '0', STR_PAD_LEFT),
+                    ])->save();
+                });
         });
     }
 }

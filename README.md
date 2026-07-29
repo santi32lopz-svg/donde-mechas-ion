@@ -10,44 +10,66 @@ El sistema permite la toma de pedidos presenciales en múltiples dispositivos (M
 
 ## **🛠️ Stack Tecnológico**
 
-* **Backend:** [Laravel 11](https://laravel.com/docs) (PHP 8.3+)  
-* **Frontend:** [Livewire 3](https://livewire.laravel.com/) \+ Bootstrap 5.3 \+ Dark Touch CSS  
-* **Base de Datos:** PostgreSQL (SaaS Multi-Tenant Schema)  
-* **Entorno:** [Laravel Sail](https://laravel.com/docs/11.x/sail) (Docker)  
+* **Backend:** [Laravel 13](https://laravel.com/docs) (PHP 8.3+)
+* **Frontend:** [Livewire 4](https://livewire.laravel.com/) + Bootstrap 5.3 + Dark Touch CSS
+* **Base de Datos:** PostgreSQL (SaaS Multi-Tenant Schema)
+* **Entorno:** [Laravel Sail](https://laravel.com/docs/sail) (Docker)
 * **Control de Versiones:** GitHub
+
+Bootstrap, FontAwesome, Bootstrap Icons y las tipografías se empaquetan con
+Vite desde `node_modules`, no desde un CDN: la terminal tiene que abrir aunque
+el local se quede sin internet.
 
 ## **📋 Prerrequisitos**
 
-Antes de comenzar, asegúrate de tener instalado en tu máquina:
-
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/) (o Docker Engine).  
-* [Composer](https://getcomposer.org/) (para gestión de dependencias de PHP).  
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/) (o Docker Engine).
 * [Git](https://git-scm.com/).
+
+No hace falta instalar PHP, Composer ni Node: todo corre dentro de los
+contenedores.
 
 ## **⚙️ Instalación y Configuración (Local)**
 
-1. **Clonar el repositorio:**
+**1. Clonar el repositorio**
 
-git clone https://github.com/TuUsuario/donde-mechas.git  
-cd donde-mechas
+```bash
+git clone https://github.com/santi32lopz-svg/donde-mechas-ion.git
+cd donde-mechas-ion
+```
 
-2. **Instalar dependencias:**
+**2. Instalar dependencias PHP**
 
-composer install
+`./vendor/bin/sail` todavía no existe, así que se usa un contenedor desechable:
 
-3. **Configurar entorno:** Crea tu archivo .env a partir del ejemplo:
+```bash
+docker run --rm -v "${PWD}:/var/www/html" -w /var/www/html laravelsail/php84-composer:latest composer install --ignore-platform-reqs
+```
 
+**3. Configurar entorno**
+
+```bash
 cp .env.example .env
+```
 
-4. **Levantar el entorno (Docker/Sail):**
+**4. Levantar, migrar y compilar**
 
-./vendor/bin/sail up \-d
-
-5. **Ejecutar migraciones y datos iniciales:**
-
-./vendor/bin/sail artisan migrate:fresh \--seed
+```bash
+docker compose up -d
+docker compose exec laravel.test php artisan key:generate
+docker compose exec laravel.test php artisan migrate:fresh --seed
+docker compose exec laravel.test php artisan storage:link
+docker compose exec laravel.test npm install
+docker compose exec laravel.test npm run build
+```
 
 El sistema estará disponible en http://localhost.
+
+> **Windows:** `./vendor/bin/sail` es un script `sh` y PowerShell no puede
+> ejecutarlo; además PowerShell 5.1 no admite `&&`. Usa `docker compose exec`
+> como arriba, o trabaja desde Git Bash / WSL si prefieres el atajo `sail`.
+
+Para desarrollo con recarga en caliente, deja corriendo `docker compose exec
+laravel.test npm run dev` en lugar de `npm run build`.
 
 ### **🔐 Credenciales de Prueba (Seeder)**
 
@@ -65,12 +87,13 @@ Para mantener el orden y la calidad del código, seguimos estas reglas:
 
 ## **📚 Documentación de Referencia**
 
-Todo el conocimiento del negocio y la arquitectura se encuentra en la carpeta /docs:
+Todo el conocimiento del negocio y la arquitectura se encuentra en la carpeta `/docs`:
 
-* [docs/guia\_estilos\_css.md](https://gemini.google.com/app/docs/guia_estilos_css.md): Sistema de diseño "Dark Touch", componentes táctiles, tokens CSS y estrategia responsive (Mobile-First).  
-* contexto\_proyecto\_claude.md: Reglas de negocio, gramajes e inventario.  
-* estandares\_desarrollo.md: Convenciones de código y protocolo de revisión.  
-* plan\_de\_trabajo\_pos.md: Hoja de ruta y fases del proyecto.
+* [Guía de Estilos CSS (Dark Touch POS).md](docs/Gu%C3%ADa%20de%20Estilos%20CSS%20(Dark%20Touch%20POS).md): Sistema de diseño "Dark Touch", componentes táctiles, tokens CSS y estrategia responsive (Mobile-First). Los tokens `--pos-*` viven en `resources/css/app.css`.
+* [Arquitectura SaaS Multi-Tenant.md](docs/Arquitectura%20SaaS%20Multi-Tenant.md): Aislamiento por `negocio_id` y modelo de suscripción.
+
+Aún sin escribir: reglas de negocio y gramajes, convenciones de código y hoja
+de ruta. Se listaban aquí como si existieran, pero nunca se crearon.
 
 *Desarrollado para el crecimiento de "Donde Mechas" y el ecosistema SaaS POS.*
 

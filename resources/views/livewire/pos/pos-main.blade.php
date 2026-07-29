@@ -101,24 +101,47 @@
 
     {{-- ================================================= --}}
     {{-- COLUMNA DERECHA (30%) - TIRILLA / CARRITO ACTIVO   --}}
+    {{--                                                    --}}
+    {{-- offcanvas-md: por debajo de 768px la tirilla se     --}}
+    {{-- convierte en panel inferior desplegable; de ahí     --}}
+    {{-- para arriba es una columna normal.                  --}}
+    {{--                                                    --}}
+    {{-- wire:ignore.self evita que Livewire borre la clase   --}}
+    {{-- "show" que Bootstrap añade al abrir: sin esto el     --}}
+    {{-- panel se cerraría solo al tocar + o -.               --}}
     {{-- ================================================= --}}
-    <div class="pos-ticket-col">
+    <div
+        class="pos-ticket-col offcanvas-md offcanvas-bottom"
+        tabindex="-1"
+        id="posTicketPanel"
+        aria-labelledby="posTicketLabel"
+        wire:ignore.self
+    >
         <div class="pos-ticket-panel">
 
             <div class="pos-ticket-header d-flex justify-content-between align-items-center">
-                <h5 class="m-0 font-brand text-white">
+                <h5 class="m-0 font-brand text-white" id="posTicketLabel">
                     <i class="fa-solid fa-receipt me-2" style="color: var(--pos-primary);"></i>Pedido Activo
                 </h5>
-                @if($lineas->isNotEmpty())
+                <div class="d-flex align-items-center gap-2">
+                    @if($lineas->isNotEmpty())
+                        <button
+                            wire:click="clearCart"
+                            wire:confirm="¿Estás seguro de vaciar el pedido actual?"
+                            class="btn btn-sm"
+                            style="color: var(--pos-danger); border: 1px solid var(--pos-danger); border-radius: var(--radius-touch);"
+                        >
+                            Vaciar
+                        </button>
+                    @endif
                     <button
-                        wire:click="clearCart"
-                        wire:confirm="¿Estás seguro de vaciar el pedido actual?"
-                        class="btn btn-sm"
-                        style="color: var(--pos-danger); border: 1px solid var(--pos-danger); border-radius: var(--radius-touch);"
-                    >
-                        Vaciar
-                    </button>
-                @endif
+                        type="button"
+                        class="btn-close btn-close-white d-md-none"
+                        data-bs-dismiss="offcanvas"
+                        data-bs-target="#posTicketPanel"
+                        aria-label="Cerrar pedido"
+                    ></button>
+                </div>
             </div>
 
             <div class="pos-ticket-body">
@@ -175,6 +198,29 @@
             </div>
 
         </div>
+    </div>
+
+    {{-- ================================================= --}}
+    {{-- BARRA INFERIOR FIJA (solo móvil)                   --}}
+    {{-- Mantiene el total a la vista y abre la tirilla, que --}}
+    {{-- en móvil ya no está en pantalla.                    --}}
+    {{-- ================================================= --}}
+    <div class="pos-mobile-bar d-md-none">
+        <button
+            type="button"
+            class="btn btn-touch btn-touch-primary w-100"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#posTicketPanel"
+            aria-controls="posTicketPanel"
+            @disabled($lineas->isEmpty())
+        >
+            <i class="fa-solid fa-receipt"></i>
+            @if($lineas->isNotEmpty())
+                Ver Pedido ({{ $lineas->sum('cantidad') }}) &mdash; ${{ number_format($total, 0, ',', '.') }}
+            @else
+                Carrito vacío
+            @endif
+        </button>
     </div>
 
 </div>

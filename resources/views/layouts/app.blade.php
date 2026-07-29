@@ -11,18 +11,8 @@
 
     <link rel="icon" href="{{ asset('favicon.ico') }}">
 
-    <!-- Google Fonts: Montserrat & Rubik -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Bootstrap 5.3 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- FontAwesome 6 Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    {{-- Sistema de diseño "Dark Touch" (tokens --pos-* y componentes táctiles) --}}
+    {{-- Bootstrap, FontAwesome, tipografías y el sistema de diseño "Dark Touch"
+         van empaquetados por Vite, no por CDN: el POS debe abrir sin internet. --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @livewireStyles
@@ -97,9 +87,6 @@
         {{ $slot ?? '' }}
         @yield('content')
     </main>
-
-    <!-- Bootstrap 5.3 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     @livewireScripts
 

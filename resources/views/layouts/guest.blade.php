@@ -7,13 +7,8 @@
 
     <title>@yield('title', 'POS SaaS')</title>
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- Estilos Personalizados POS Dark Touch -->
+    {{-- Bootstrap, iconos y el tema Dark Touch van empaquetados por Vite,
+         no por CDN: el POS debe abrir sin internet. --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @livewireStyles
@@ -25,9 +20,6 @@
         @yield('content')
     </main>
 
-    <!-- Scripts de Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
     @livewireScripts
 </body>
 </html>
