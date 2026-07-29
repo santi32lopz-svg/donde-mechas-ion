@@ -80,9 +80,9 @@ pendientes sobre el total.
 
 ### Bloque 2 — Cuerpo de issue para GitHub
 
-Markdown listo para pegar, sin envolver en un bloque de código para que el
-usuario pueda copiarlo tal cual. Escríbelo para alguien que abre el issue sin
-haber seguido la conversación:
+Markdown listo para pegar, dentro de un bloque de código para que el usuario
+lo copie de una pieza. Escríbelo para alguien que abre el issue sin haber
+seguido la conversación:
 
 - Un párrafo de contexto: qué se construyó y dónde vive.
 - Una tabla o lista de lo entregado, con enlaces a los archivos.
