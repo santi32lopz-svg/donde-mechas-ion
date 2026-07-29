@@ -11,11 +11,15 @@
                 <span class="input-group-text">
                     <i class="fa-solid fa-magnifying-glass" style="color: var(--pos-text-muted);"></i>
                 </span>
+                {{-- El lector de códigos de barras teclea el código y manda Enter --}}
                 <input
                     type="text"
                     wire:model.live.debounce.300ms="search"
+                    wire:keydown.enter.prevent="agregarPorCodigoDeBarras"
                     class="form-control form-control-touch"
-                    placeholder="Buscar por nombre o código de barras..."
+                    placeholder="Buscar o escanear código de barras..."
+                    autocomplete="off"
+                    autofocus
                 >
                 @if($search)
                     <button type="button" class="btn btn-touch btn-touch-danger" wire:click="$set('search', '')">
@@ -52,15 +56,21 @@
         <div class="pos-product-grid-wrapper">
             <div class="pos-product-grid">
                 @forelse($productos as $producto)
+                    {{-- wire:loading.attr deshabilita la cuadrícula mientras se registra
+                         un producto: en tablet lenta el doble toque duplicaba la línea --}}
                     <button
                         type="button"
                         wire:click="addToCart({{ $producto->id }})"
                         wire:key="producto-{{ $producto->id }}"
+                        wire:loading.attr="disabled"
+                        wire:target="addToCart"
                         class="pos-card-product"
                     >
                         <div class="pos-product-image">
                             @if($producto->imagen_path)
-                                <img src="{{ asset('storage/' . $producto->imagen_path) }}" alt="{{ $producto->nombre }}">
+                                <img src="{{ asset('storage/' . $producto->imagen_path) }}"
+                                     alt="{{ $producto->nombre }}"
+                                     loading="lazy">
                             @else
                                 <i class="fa-solid fa-utensils"></i>
                             @endif
@@ -79,6 +89,12 @@
                     </div>
                 @endforelse
             </div>
+
+            @if($limiteAlcanzado)
+                <p class="small text-center mt-3 mb-0" style="color: var(--pos-text-muted);">
+                    Se muestran los primeros {{ $productos->count() }} productos. Afina la búsqueda para ver el resto.
+                </p>
+            @endif
         </div>
 
     </div>
@@ -93,7 +109,7 @@
                 <h5 class="m-0 font-brand text-white">
                     <i class="fa-solid fa-receipt me-2" style="color: var(--pos-primary);"></i>Pedido Activo
                 </h5>
-                @if(count($cart) > 0)
+                @if($lineas->isNotEmpty())
                     <button
                         wire:click="clearCart"
                         wire:confirm="¿Estás seguro de vaciar el pedido actual?"
@@ -106,8 +122,8 @@
             </div>
 
             <div class="pos-ticket-body">
-                @if(count($cart) > 0)
-                    @foreach($cart as $item)
+                @if($lineas->isNotEmpty())
+                    @foreach($lineas as $item)
                         <div class="pos-ticket-item" wire:key="cart-item-{{ $item['id'] }}">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <span class="fw-bold text-white pe-2">{{ $item['nombre'] }}</span>
@@ -152,7 +168,7 @@
                 <button
                     type="button"
                     class="btn btn-touch btn-touch-primary w-100"
-                    @if(count($cart) === 0) disabled @endif
+                    @disabled($lineas->isEmpty())
                 >
                     <i class="fa-solid fa-money-bill-1-wave"></i> COBRAR CONTADO
                 </button>

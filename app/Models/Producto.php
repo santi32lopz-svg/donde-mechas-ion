@@ -2,17 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToNegocio;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Producto extends Model
 {
-    protected $guarded = [];
+    use BelongsToNegocio;
 
-    public function negocio()
-    {
-        return $this->belongsTo(Negocio::class);
-    }
+    protected $guarded = [];
 
     /**
      * Filtra por nombre o código de barras para el buscador del POS.
@@ -39,5 +37,14 @@ class Producto extends Model
             $sub->where('nombre', $operador, $patron)
                 ->orWhere('codigo_barras', $operador, $patron);
         });
+    }
+
+    /**
+     * Coincidencia exacta de código de barras, para el lector del POS.
+     * Aprovecha el índice, a diferencia del LIKE con comodín inicial.
+     */
+    public function scopePorCodigoDeBarras(Builder $query, ?string $codigo): Builder
+    {
+        return $query->where('codigo_barras', trim((string) $codigo));
     }
 }
