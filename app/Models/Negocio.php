@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Negocio extends Model
@@ -12,7 +13,13 @@ class Negocio extends Model
 
     protected $guarded = [];
 
-    public function users() { return $this->hasMany(User::class, 'negocio_id'); }
+    public function usuarios(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'negocio_usuario')
+            ->withPivot(['rol', 'activo'])
+            ->withTimestamps();
+    }
+
     public function categorias() { return $this->hasMany(Categoria::class, 'negocio_id'); }
     public function productos() { return $this->hasMany(Producto::class, 'negocio_id'); }
     public function pedidos() { return $this->hasMany(Pedido::class, 'negocio_id'); }

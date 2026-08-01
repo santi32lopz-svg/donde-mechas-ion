@@ -43,7 +43,7 @@ class EstablecerNegocioActivo
             session()->forget(TenantContext::CLAVE_SESION);
         }
 
-        $this->tenant->usar($usuario->negocio_id);
+        $this->tenant->usar($usuario->negociosDisponibles()->value('negocios.id'));
 
         return $next($request);
     }

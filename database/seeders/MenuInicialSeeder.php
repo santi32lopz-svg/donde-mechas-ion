@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\RolUsuario;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Categoria;
@@ -38,22 +39,32 @@ class MenuInicialSeeder extends Seeder
             // -------------------------------------------------------------
             // 1. USUARIOS INICIALES VINCULADOS AL NEGOCIO
             // -------------------------------------------------------------
-            User::create([
-                'negocio_id' => $negocioId,
-                'nombre'     => 'Administrador Mechas',
-                'email'      => 'admin@dondemechas.com',
-                'password'   => Hash::make('admin123'),
-                'rol'        => 'administrador',
-                'activo'     => true,
+            // El vínculo con el negocio vive ahora en la tabla pivote
+            // negocio_usuario, no en una columna de users.
+            $administrador = User::create([
+                'nombre'   => 'Administrador Mechas',
+                'email'    => 'admin@dondemechas.com',
+                'password' => Hash::make('admin123'),
+                'rol'      => RolUsuario::Administrador->value,
+                'activo'   => true,
             ]);
 
-            User::create([
-                'negocio_id' => $negocioId,
-                'nombre'     => 'Cajero Turno',
-                'email'      => 'caja@dondemechas.com',
-                'password'   => Hash::make('caja123'),
-                'rol'        => 'cajero',
-                'activo'     => true,
+            $cajero = User::create([
+                'nombre'   => 'Cajero Turno',
+                'email'    => 'caja@dondemechas.com',
+                'password' => Hash::make('caja123'),
+                'rol'      => RolUsuario::Cajero->value,
+                'activo'   => true,
+            ]);
+
+            $administrador->negocios()->attach($negocioId, [
+                'rol'    => RolUsuario::Administrador->value,
+                'activo' => true,
+            ]);
+
+            $cajero->negocios()->attach($negocioId, [
+                'rol'    => RolUsuario::Cajero->value,
+                'activo' => true,
             ]);
 
             // -------------------------------------------------------------

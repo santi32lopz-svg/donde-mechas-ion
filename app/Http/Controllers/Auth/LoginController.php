@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Support\TenantContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -29,21 +30,28 @@ class LoginController extends Controller
 
             $user = Auth::user(); // Obtenemos el usuario autenticado
 
-            // Verificación Multi-Tenant: Validar que el negocio del usuario exista y esté activo
-            if (!$user->negocio || $user->negocio->estado_suscripcion !== 'activo') {
+            // Verificación Multi-Tenant: el usuario debe tener al menos un
+            // negocio activo. Con la tabla pivote puede pertenecer a varios, así
+            // que ya no basta con mirar un único negocio asociado.
+            $negocio = $user->negociosDisponibles()->orderBy('negocios.id')->first();
+
+            if ($negocio === null) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
 
                 return back()->withErrors([
-                    'email' => 'El negocio asociado a esta cuenta no está activo o no existe.',
+                    'email' => 'Esta cuenta no tiene ningún negocio activo asignado.',
                 ]);
             }
 
-            // Guardamos la información del Tenant en la sesión global
+            // Se deja un negocio activo por defecto; el selector de la barra
+            // superior permitirá cambiarlo si el usuario tiene varios.
+            app(TenantContext::class)->cambiarA($negocio->id);
+
             session([
-                'tenant_id' => $user->negocio_id,
-                'tenant_nombre' => $user->negocio->nombre,
+                'tenant_id' => $negocio->id,
+                'tenant_nombre' => $negocio->nombre,
             ]);
 
             return redirect()->intended(route('pos.main'));

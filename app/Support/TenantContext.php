@@ -107,23 +107,18 @@ class TenantContext
     /**
      * Comprueba si el usuario puede operar sobre un negocio.
      *
-     * Etapa 1: se apoya en users.negocio_id, que es la relación que existe hoy.
-     * En la Etapa 2 este método pasará a consultar el pivote negocio_usuario y
-     * será el único punto que haya que tocar.
+     * Se resuelve contra el pivote negocio_usuario, que es la única relación
+     * entre usuarios y negocios desde la Etapa 2.
      */
     public function usuarioPuedeAcceder(?User $usuario, int $negocioId): bool
     {
-        if ($usuario === null) {
-            return false;
-        }
-
-        return $usuario->negocio_id === $negocioId;
+        return $usuario?->puedeAccederA($negocioId) ?? false;
     }
 
     /**
-     * Sin negocio fijado se intenta el de la sesión y, si no vale, el del
-     * usuario. La sesión se valida siempre: un id manipulado no debe abrir
-     * el catálogo de otro negocio.
+     * Sin negocio fijado se intenta el de la sesión y, si no vale, el primero
+     * disponible del usuario. La sesión se valida siempre: un id manipulado no
+     * debe abrir el catálogo de otro negocio.
      */
     private function resolverPorDefecto(): ?int
     {
@@ -139,6 +134,6 @@ class TenantContext
             return $enSesion;
         }
 
-        return $usuario->negocio_id;
+        return $usuario->negociosDisponibles()->value('negocios.id');
     }
 }

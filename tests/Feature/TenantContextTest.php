@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\RolUsuario;
 use App\Models\Categoria;
 use App\Models\Negocio;
 use App\Models\Producto;
@@ -32,14 +33,11 @@ class TenantContextTest extends TestCase
         $this->crearProducto($this->negocioPropio, 'Hamburguesa Especial');
         $this->crearProducto($this->negocioAjeno, 'Pizza Napolitana');
 
-        $this->usuario = User::create([
-            'negocio_id' => $this->negocioPropio->id,
-            'nombre' => 'Cajero Turno',
-            'email' => 'caja@dondemechas.test',
-            'password' => 'secret',
-            'rol' => 'cajero',
-            'activo' => true,
-        ]);
+        $this->usuario = $this->crearUsuarioEnNegocio(
+            $this->negocioPropio,
+            RolUsuario::Cajero,
+            ['nombre' => 'Cajero Turno', 'email' => 'caja@dondemechas.test'],
+        );
     }
 
     public function test_sin_sesion_no_se_aplica_aislamiento(): void

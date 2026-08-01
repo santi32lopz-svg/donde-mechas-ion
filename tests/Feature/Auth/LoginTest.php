@@ -2,10 +2,14 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Enums\RolUsuario;
+use App\Models\Negocio;
 use App\Models\User;
+use App\Support\TenantContext;
 use Database\Seeders\MenuInicialSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class LoginTest extends TestCase
@@ -48,7 +52,7 @@ class LoginTest extends TestCase
 
         $user = User::query()->where('email', 'admin@dondemechas.com')->firstOrFail();
         DB::table('negocios')
-            ->where('id', $user->negocio_id)
+            ->whereIn('id', $user->negocios()->pluck('negocios.id'))
             ->update(['estado_suscripcion' => 'suspendido']);
 
         $response = $this->from('/login')->post('/login', [
@@ -59,5 +63,55 @@ class LoginTest extends TestCase
         $response->assertRedirect('/login');
         $this->assertGuest();
         $response->assertSessionHasErrors(['email']);
+    }
+
+    public function test_user_cannot_login_without_any_business(): void
+    {
+        // Regla nueva de la plataforma: sin al menos un negocio activo no se
+        // entra, aunque las credenciales sean correctas.
+        User::create([
+            'nombre' => 'Usuario Sin Negocio',
+            'email' => 'huerfano@dondemechas.com',
+            'password' => Hash::make('secret123'),
+            'rol' => RolUsuario::Cajero->value,
+            'activo' => true,
+        ]);
+
+        $response = $this->from('/login')->post('/login', [
+            'email' => 'huerfano@dondemechas.com',
+            'password' => 'secret123',
+        ]);
+
+        $response->assertRedirect('/login');
+        $this->assertGuest();
+        $response->assertSessionHasErrors(['email']);
+    }
+
+    public function test_user_with_two_businesses_gets_one_active_by_default(): void
+    {
+        $this->seed(MenuInicialSeeder::class);
+
+        $user = User::query()->where('email', 'admin@dondemechas.com')->firstOrFail();
+        $segundo = Negocio::create([
+            'nombre' => 'Pizza House',
+            'slug' => 'pizza-house',
+            'plan' => 'basico',
+            'estado_suscripcion' => 'activo',
+        ]);
+        $user->negocios()->attach($segundo->id, [
+            'rol' => RolUsuario::Administrador->value,
+            'activo' => true,
+        ]);
+
+        $this->post('/login', [
+            'email' => 'admin@dondemechas.com',
+            'password' => 'admin123',
+        ])->assertRedirect('/pos');
+
+        // Se elige uno por defecto; el selector superior permitirá cambiarlo.
+        $this->assertContains(
+            session(TenantContext::CLAVE_SESION),
+            $user->negocios()->pluck('negocios.id')->all(),
+        );
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Pos;
 
+use App\Enums\RolUsuario;
 use App\Livewire\Pos\PosMain;
 use App\Models\Categoria;
 use App\Models\Negocio;
@@ -33,13 +34,9 @@ class PosMainTest extends TestCase
         $this->productoPropio = $this->crearProducto($propio, 'Hamburguesa Especial', 17000, '7700000001');
         $this->productoAjeno = $this->crearProducto($ajeno, 'Michelada Ajena', 9000, '7799999999');
 
-        $this->cajero = User::create([
-            'negocio_id' => $propio->id,
+        $this->cajero = $this->crearUsuarioEnNegocio($propio, RolUsuario::Cajero, [
             'nombre' => 'Cajero Turno',
             'email' => 'caja@dondemechas.test',
-            'password' => 'secret',
-            'rol' => 'cajero',
-            'activo' => true,
         ]);
     }
 
