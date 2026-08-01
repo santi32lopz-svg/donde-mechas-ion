@@ -212,10 +212,7 @@
 
                 <button
                     type="button"
-                    wire:click="cobrar"
-                    wire:confirm="¿Registrar la venta por ${{ number_format($total, 0, ',', '.') }} en efectivo?"
-                    wire:loading.attr="disabled"
-                    wire:target="cobrar"
+                    wire:click="abrirCobro"
                     class="btn btn-touch btn-touch-primary w-100"
                     @disabled($lineas->isEmpty())
                 >
@@ -248,5 +245,123 @@
             @endif
         </button>
     </div>
+
+    {{-- ================================================= --}}
+    {{-- DIÁLOGO DE COBRO                                   --}}
+    {{-- Mientras está abierto el carrito queda bloqueado.  --}}
+    {{-- Cancelar lo devuelve intacto: nunca salió de aquí. --}}
+    {{-- ================================================= --}}
+    @if($cobrando)
+        <div class="pos-cobro-fondo" wire:key="dialogo-cobro">
+            <div class="pos-cobro" role="dialog" aria-modal="true" aria-labelledby="tituloCobro">
+
+                <div class="pos-cobro-cabecera">
+                    <div>
+                        <h2 class="m-0 font-brand text-white" id="tituloCobro">Cobrar</h2>
+                        <span class="small" style="color: var(--pos-text-muted);">
+                            {{ $lineas->sum('cantidad') }} ítems
+                        </span>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white"
+                            wire:click="cerrarCobro" aria-label="Cancelar cobro"></button>
+                </div>
+
+                <div class="pos-cobro-total">
+                    <span>TOTAL A PAGAR</span>
+                    <strong>${{ number_format($total, 0, ',', '.') }}</strong>
+                </div>
+
+                <div class="pos-cobro-cuerpo">
+                    {{-- Método de pago --}}
+                    <div class="pos-metodos">
+                        @foreach(\App\Support\RegistroDeVenta::metodosDePago() as $metodo)
+                            <button type="button" wire:click="seleccionarMetodo('{{ $metodo }}')"
+                                    class="btn-pay-method {{ $metodoPago === $metodo ? 'active' : '' }}">
+                                @if($metodo === 'efectivo')
+                                    <i class="fa-solid fa-money-bill-1-wave d-block mb-1"></i>Efectivo
+                                @elseif($metodo === 'tarjeta')
+                                    <i class="fa-solid fa-credit-card d-block mb-1"></i>Tarjeta
+                                @else
+                                    <i class="fa-solid fa-mobile-screen d-block mb-1"></i>{{ ucfirst($metodo) }}
+                                @endif
+                            </button>
+                        @endforeach
+                    </div>
+
+                    @if($metodoPago === 'efectivo')
+                        @unless($hayTurnoAbierto)
+                            <div class="alert admin-alerta-error d-flex align-items-start gap-2 py-2 mt-3 mb-0">
+                                <i class="fa-solid fa-triangle-exclamation mt-1"></i>
+                                <span>No hay turno de caja abierto. Ábrelo antes de cobrar en efectivo.</span>
+                            </div>
+                        @endunless
+
+                        {{-- El campo acepta el teclado físico; el numpad escribe
+                             en esta misma propiedad. Un solo camino, dos formas. --}}
+                        <label class="form-label text-light fw-semibold mt-3" for="recibido">Efectivo recibido</label>
+                        <input id="recibido" type="text" inputmode="numeric" autocomplete="off" autofocus
+                               wire:model.live="efectivoRecibido"
+                               wire:keydown.enter.prevent="confirmarCobro"
+                               wire:keydown.escape.prevent="cerrarCobro"
+                               class="form-control form-control-touch pos-cobro-monto"
+                               placeholder="0">
+
+                        <div class="pos-cobro-atajos">
+                            <button type="button" wire:click="montoExacto" class="pos-atajo">Exacto</button>
+                            @foreach([5000, 10000, 20000, 50000] as $billete)
+                                <button type="button" wire:click="pulsar('{{ $billete }}')" class="pos-atajo">
+                                    ${{ number_format($billete, 0, ',', '.') }}
+                                </button>
+                            @endforeach
+                        </div>
+
+                        <div class="pos-numpad mt-3">
+                            @foreach([1,2,3,4,5,6,7,8,9] as $numero)
+                                <button type="button" wire:click="pulsar('{{ $numero }}')" class="pos-numpad-btn">{{ $numero }}</button>
+                            @endforeach
+                            <button type="button" wire:click="pulsar('00')" class="pos-numpad-btn">00</button>
+                            <button type="button" wire:click="pulsar('0')" class="pos-numpad-btn">0</button>
+                            <button type="button" wire:click="borrarDigito" class="pos-numpad-btn">
+                                <i class="fa-solid fa-delete-left"></i>
+                            </button>
+                        </div>
+
+                        <div class="pos-cobro-cambio {{ $faltante > 0 ? 'insuficiente' : '' }}">
+                            @if($faltante > 0)
+                                <span>Faltan</span>
+                                <strong>${{ number_format($faltante, 0, ',', '.') }}</strong>
+                            @else
+                                <span>Cambio</span>
+                                <strong>${{ number_format($cambio, 0, ',', '.') }}</strong>
+                            @endif
+                        </div>
+                    @else
+                        <p class="m-0 mt-3" style="color: var(--pos-text-muted);">
+                            El importe es exacto: confirma cuando la transacción esté aprobada.
+                        </p>
+                    @endif
+
+                    @if($mensajeError)
+                        <div class="alert admin-alerta-error d-flex align-items-start gap-2 py-2 mt-3 mb-0">
+                            <i class="fa-solid fa-triangle-exclamation mt-1"></i>
+                            <span>{{ $mensajeError }}</span>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="pos-cobro-pie">
+                    <button type="button" wire:click="cerrarCobro" class="btn btn-touch admin-btn-secundario">
+                        Cancelar
+                    </button>
+                    <button type="button" wire:click="confirmarCobro"
+                            wire:loading.attr="disabled" wire:target="confirmarCobro"
+                            class="btn btn-touch btn-touch-primary flex-grow-1"
+                            @disabled($metodoPago === 'efectivo' && $faltante > 0)>
+                        <i class="fa-solid fa-check"></i> Confirmar cobro
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 
 </div>

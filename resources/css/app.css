@@ -967,3 +967,123 @@ body {
     color: var(--pos-secondary);
     font-size: 0.85rem;
 }
+
+/* ==========================================
+   DIÁLOGO DE COBRO
+   Overlay gestionado por Livewire, no por Bootstrap: así no hay estado en el
+   DOM que el morphing pueda descartar.
+   ========================================== */
+.pos-cobro-fondo {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 1070;
+}
+
+.pos-cobro {
+    background-color: var(--pos-bg-card);
+    border: 1px solid var(--pos-border-color);
+    border-radius: var(--radius-touch);
+    width: 100%;
+    max-width: 440px;
+    max-height: 96vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.pos-cobro-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--pos-border-color);
+}
+
+.pos-cobro-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background-color: var(--pos-bg-surface);
+    border-bottom: 1px solid var(--pos-border-color);
+    color: var(--pos-text-muted);
+    font-weight: 600;
+}
+
+.pos-cobro-total strong {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.9rem;
+    color: var(--pos-primary);
+}
+
+.pos-cobro-cuerpo { padding: 20px; overflow-y: auto; }
+
+.pos-metodos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.pos-metodos .btn-pay-method { min-height: 68px; font-size: 0.8rem; padding: 8px 4px; }
+.pos-metodos .btn-pay-method i { font-size: 1.2rem; }
+
+/* Importe grande: se lee de un vistazo con el cliente esperando */
+.pos-cobro-monto {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.9rem !important;
+    font-weight: 800;
+    text-align: right;
+    min-height: 64px;
+}
+
+.pos-cobro-atajos { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+.pos-atajo {
+    flex: 1 1 auto;
+    min-height: 44px;
+    border-radius: 10px;
+    border: 1px solid var(--pos-border-color);
+    background-color: var(--pos-bg-surface);
+    color: var(--pos-text-main);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.pos-atajo:active { transform: scale(0.96); }
+.pos-atajo:hover { border-color: var(--pos-primary); color: var(--pos-primary); }
+
+.pos-cobro-cambio {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: var(--radius-touch);
+    background-color: rgba(0, 230, 118, 0.12);
+    border: 1px solid var(--pos-success);
+    color: var(--pos-success);
+    font-weight: 600;
+}
+
+.pos-cobro-cambio strong { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; }
+
+.pos-cobro-cambio.insuficiente {
+    background-color: rgba(255, 56, 56, 0.12);
+    border-color: var(--pos-danger);
+    color: var(--pos-danger);
+}
+
+.pos-cobro-pie {
+    display: flex;
+    gap: 8px;
+    padding: 16px 20px;
+    border-top: 1px solid var(--pos-border-color);
+    background-color: var(--pos-bg-surface);
+    border-radius: 0 0 var(--radius-touch) var(--radius-touch);
+}
+
+@media (max-width: 480px) {
+    .pos-metodos { grid-template-columns: repeat(2, 1fr); }
+    .pos-cobro { max-height: 100vh; border-radius: 0; }
+    .pos-cobro-fondo { padding: 0; }
+}

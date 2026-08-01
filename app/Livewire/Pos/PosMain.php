@@ -52,6 +52,22 @@ class PosMain extends Component
 
     public ?string $mensajeError = null;
 
+    // ------------------------------------------------------------------
+    // Diálogo de cobro
+    //
+    // Vive en este componente y no en uno aparte porque el carrito debe quedar
+    // bloqueado mientras está abierto y volver intacto si se cancela. Al no
+    // salir nunca de aquí, no hay nada que sincronizar ni que restaurar: la
+    // cancelación es simplemente cerrar el diálogo.
+    // ------------------------------------------------------------------
+
+    public bool $cobrando = false;
+
+    public string $metodoPago = 'efectivo';
+
+    /** Solo dígitos; se formatea al mostrarlo. */
+    public string $efectivoRecibido = '';
+
     public function mount(): void
     {
         // El negocio ya no es un atributo del usuario sino el contexto de la
@@ -73,6 +89,10 @@ class PosMain extends Component
      */
     public function addToCart(int $productoId): void
     {
+        if ($this->carritoBloqueado()) {
+            return;
+        }
+
         // El scope global de negocio ya impide alcanzar productos de otro tenant.
         $producto = Producto::query()
             ->whereKey($productoId)
@@ -99,7 +119,7 @@ class PosMain extends Component
     {
         $codigo = trim($this->search);
 
-        if ($codigo === '') {
+        if ($this->carritoBloqueado() || $codigo === '') {
             return;
         }
 
@@ -123,7 +143,7 @@ class PosMain extends Component
      */
     public function updateQuantity(int $productoId, string $action): void
     {
-        if (! isset($this->cart[$productoId])) {
+        if ($this->carritoBloqueado() || ! isset($this->cart[$productoId])) {
             return;
         }
 
@@ -149,6 +169,10 @@ class PosMain extends Component
      */
     public function removeFromCart(int $productoId): void
     {
+        if ($this->carritoBloqueado()) {
+            return;
+        }
+
         if (isset($this->cart[$productoId])) {
             unset($this->cart[$productoId]);
             $this->persistirCarrito();
@@ -181,10 +205,16 @@ class PosMain extends Component
         $this->cart = [];
         session()->forget($this->claveDeSesion());
 
+        $cambio = $this->recibido() - (float) $pedido->monto_total;
+
+        $this->cobrando = false;
+        $this->efectivoRecibido = '';
+
         $this->mensajeExito = sprintf(
-            'Pedido %s cobrado por $%s.',
+            'Pedido %s cobrado por $%s.%s',
             $pedido->numeroFormateado(),
             number_format((float) $pedido->monto_total, 0, ',', '.'),
+            $cambio > 0 ? ' Cambio: $'.number_format($cambio, 0, ',', '.').'.' : '',
         );
     }
 
@@ -193,8 +223,132 @@ class PosMain extends Component
      */
     public function clearCart(): void
     {
+        if ($this->carritoBloqueado()) {
+            return;
+        }
+
         $this->cart = [];
         session()->forget($this->claveDeSesion());
+    }
+
+    /**
+     * Mientras se está cobrando el carrito no admite cambios.
+     *
+     * La comprobación es de servidor, no solo del diálogo que tapa la pantalla:
+     * una petición fabricada a mano tampoco puede alterar lo que se está
+     * cobrando.
+     */
+    private function carritoBloqueado(): bool
+    {
+        return $this->cobrando;
+    }
+
+    // ------------------------------------------------------------------
+    // Diálogo de cobro
+    // ------------------------------------------------------------------
+
+    public function abrirCobro(): void
+    {
+        if ($this->cart === []) {
+            return;
+        }
+
+        $this->mensajeError = null;
+        $this->mensajeExito = null;
+        $this->metodoPago = 'efectivo';
+        $this->efectivoRecibido = '';
+        $this->cobrando = true;
+    }
+
+    /**
+     * Cancelar deja el carrito exactamente como estaba: nunca salió de aquí.
+     */
+    public function cerrarCobro(): void
+    {
+        $this->cobrando = false;
+        $this->efectivoRecibido = '';
+        $this->mensajeError = null;
+    }
+
+    public function seleccionarMetodo(string $metodo): void
+    {
+        if (! in_array($metodo, RegistroDeVenta::metodosDePago(), true)) {
+            return;
+        }
+
+        $this->metodoPago = $metodo;
+        $this->mensajeError = null;
+
+        // El importe recibido solo tiene sentido con efectivo en la mano.
+        if (! RegistroDeVenta::requiereTurnoDeCaja($metodo)) {
+            $this->efectivoRecibido = '';
+        }
+    }
+
+    /**
+     * Añade dígitos desde el numpad en pantalla. El teclado físico escribe
+     * directamente en el campo, así que ambos caminos acaban en la misma
+     * propiedad.
+     */
+    public function pulsar(string $digitos): void
+    {
+        $limpio = preg_replace('/\D/', '', $digitos) ?? '';
+
+        if ($limpio === '') {
+            return;
+        }
+
+        // Un tope generoso, solo para que nadie llene la pantalla de ceros.
+        $this->efectivoRecibido = substr(ltrim($this->efectivoRecibido.$limpio, '0') ?: '0', 0, 12);
+        $this->mensajeError = null;
+    }
+
+    public function borrarDigito(): void
+    {
+        $this->efectivoRecibido = substr($this->efectivoRecibido, 0, -1);
+    }
+
+    public function limpiarMonto(): void
+    {
+        $this->efectivoRecibido = '';
+    }
+
+    /**
+     * Atajo para el caso más común: el cliente paga justo.
+     */
+    public function montoExacto(): void
+    {
+        $this->efectivoRecibido = (string) (int) round($this->totalDelCarrito());
+    }
+
+    /**
+     * Confirma el cobro con el método y el importe elegidos.
+     */
+    public function confirmarCobro(): void
+    {
+        $total = $this->totalDelCarrito();
+
+        if (RegistroDeVenta::requiereTurnoDeCaja($this->metodoPago) && $this->recibido() < $total) {
+            // Cobrar de menos descuadra la caja sin dejar rastro de por qué.
+            $this->mensajeError = 'El efectivo recibido es menor que el total.';
+
+            return;
+        }
+
+        $this->cobrar($this->metodoPago);
+    }
+
+    public function recibido(): float
+    {
+        return (float) ($this->efectivoRecibido === '' ? 0 : $this->efectivoRecibido);
+    }
+
+    /**
+     * Total vigente del carrito, leído de la base de datos.
+     */
+    private function totalDelCarrito(): float
+    {
+        return (float) $this->lineasDelCarrito()->sum('subtotal');
     }
 
     /**
@@ -329,6 +483,9 @@ class PosMain extends Component
             // De momento el total es igual al subtotal; aquí entrarán impuestos si aplican.
             'total' => $subtotal,
             'limiteAlcanzado' => $productos->count() === self::MAX_PRODUCTOS,
+            'cambio' => max(0, $this->recibido() - $subtotal),
+            'faltante' => max(0, $subtotal - $this->recibido()),
+            'hayTurnoAbierto' => app(RegistroDeVenta::class)->turnoAbierto() !== null,
         ])->layout('layouts.app');
     }
 }
