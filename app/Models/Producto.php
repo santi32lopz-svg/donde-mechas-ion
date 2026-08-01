@@ -6,6 +6,7 @@ use App\Models\Concerns\BelongsToNegocio;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Producto extends Model
 {
@@ -41,6 +42,21 @@ class Producto extends Model
     public function etiqueta(): BelongsTo
     {
         return $this->belongsTo(Etiqueta::class);
+    }
+
+    public function detallePedidos(): HasMany
+    {
+        return $this->hasMany(DetallePedido::class);
+    }
+
+    /**
+     * Un producto que ya se vendió no puede borrarse: la clave foránea de
+     * detalle_pedidos lo impide y, sobre todo, hacerlo falsearía el histórico
+     * de ventas. En ese caso lo correcto es marcarlo como no disponible.
+     */
+    public function sePuedeEliminar(): bool
+    {
+        return ! $this->detallePedidos()->exists();
     }
 
     /**

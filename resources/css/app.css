@@ -889,3 +889,67 @@ body {
     background-color: var(--pos-primary);
     border-color: var(--pos-primary);
 }
+
+/* ===== Diálogo rápido (overlay gestionado por Livewire) ===== */
+.admin-modal-fondo {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1060;
+}
+
+.admin-modal {
+    background-color: var(--pos-bg-card);
+    border: 1px solid var(--pos-border-color);
+    border-radius: var(--radius-touch);
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+
+.admin-modal-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--pos-border-color);
+}
+
+.admin-modal-cuerpo { padding: 20px; }
+
+.admin-modal-pie {
+    display: flex;
+    gap: 8px;
+    padding: 16px 20px;
+    border-top: 1px solid var(--pos-border-color);
+    background-color: var(--pos-bg-surface);
+    border-radius: 0 0 var(--radius-touch) var(--radius-touch);
+}
+
+.admin-sin-etiquetas {
+    border: 1px dashed var(--pos-warning);
+    border-radius: var(--radius-touch);
+    padding: 14px;
+    background-color: rgba(255, 179, 0, 0.08);
+    color: var(--pos-warning);
+}
+
+.admin-prefijo {
+    background-color: var(--pos-bg-surface);
+    border: 1px solid var(--pos-border-color);
+    border-right: none;
+    color: var(--pos-text-muted);
+    border-radius: var(--radius-touch) 0 0 var(--radius-touch);
+}
+
+.admin-badge-etiqueta {
+    background-color: rgba(0, 180, 216, 0.15);
+    color: var(--pos-secondary);
+    border: 1px solid var(--pos-secondary);
+    font-weight: 600;
+}
