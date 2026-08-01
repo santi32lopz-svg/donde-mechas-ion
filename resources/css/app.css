@@ -953,3 +953,17 @@ body {
     border: 1px solid var(--pos-secondary);
     font-weight: 600;
 }
+
+/* ===== Lista de datos (Configuración) ===== */
+.admin-datos { display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; align-items: center; }
+.admin-datos dt { color: var(--pos-text-muted); font-weight: 600; font-size: 0.9rem; margin: 0; }
+.admin-datos dd { margin: 0; color: var(--pos-text-main); font-weight: 600; text-align: right; }
+
+.admin-slug {
+    background-color: var(--pos-bg-surface);
+    border: 1px solid var(--pos-border-color);
+    border-radius: 6px;
+    padding: 2px 8px;
+    color: var(--pos-secondary);
+    font-size: 0.85rem;
+}

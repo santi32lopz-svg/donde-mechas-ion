@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Middleware\RequiereNegocioActivo;
+use App\Livewire\Admin\Configuracion;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Etiquetas;
 use App\Livewire\Admin\MiNegocio;
 use App\Livewire\Admin\Productos;
+use App\Livewire\Admin\Usuarios;
 use App\Livewire\Auth\SeleccionNegocio;
 use App\Livewire\Auth\SeleccionRol;
 use App\Livewire\Pos\PosMain;
@@ -55,13 +57,13 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/mi-negocio', MiNegocio\Index::class)->name('mi-negocio');
             Route::get('/etiquetas', Etiquetas\Index::class)->name('etiquetas');
             Route::get('/productos', Productos\Index::class)->name('productos');
+            Route::get('/usuarios', Usuarios\Index::class)->name('usuarios');
+            Route::get('/configuracion', Configuracion::class)->name('configuracion');
 
             // Módulos con la estructura reservada; se implementan por etapas.
             $pendientes = [
                 'pedidos' => ['Pedidos', 'Historial de ventas del negocio.', 'fa-receipt'],
                 'caja' => ['Caja', 'Turnos, egresos y cuadre de caja.', 'fa-cash-register'],
-                'usuarios' => ['Usuarios', 'Quién puede entrar y con qué rol.', 'fa-users'],
-                'configuracion' => ['Configuración', 'Preferencias del negocio.', 'fa-gear'],
             ];
 
             foreach ($pendientes as $ruta => [$titulo, $descripcion, $icono]) {
