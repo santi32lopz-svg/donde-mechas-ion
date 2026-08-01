@@ -33,9 +33,15 @@ class LoginController extends Controller
             // Verificación Multi-Tenant: el usuario debe tener al menos un
             // negocio activo. Con la tabla pivote puede pertenecer a varios, así
             // que ya no basta con mirar un único negocio asociado.
-            $negocio = $user->negociosDisponibles()->orderBy('negocios.id')->first();
+            //
+            // El superadministrador es la excepción: no tiene vínculos en el
+            // pivote a propósito, porque alcanza todos los negocios por su rol y
+            // elige sobre cuál trabaja después de entrar.
+            $negocio = $user->esSuperadmin()
+                ? null
+                : $user->negociosDisponibles()->orderBy('negocios.id')->first();
 
-            if ($negocio === null) {
+            if ($negocio === null && ! $user->esSuperadmin()) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
@@ -45,16 +51,18 @@ class LoginController extends Controller
                 ]);
             }
 
-            // Se deja un negocio activo por defecto; el selector de la barra
-            // superior permitirá cambiarlo si el usuario tiene varios.
-            app(TenantContext::class)->cambiarA($negocio->id);
+            if ($negocio !== null) {
+                app(TenantContext::class)->cambiarA($negocio->id);
 
-            session([
-                'tenant_id' => $negocio->id,
-                'tenant_nombre' => $negocio->nombre,
-            ]);
+                session([
+                    'tenant_id' => $negocio->id,
+                    'tenant_nombre' => $negocio->nombre,
+                ]);
+            }
 
-            return redirect()->intended(route('pos.main'));
+            // El destino no se decide aquí: primero el usuario elige con qué rol
+            // entra, porque puede administrar un negocio y ser cajero de otro.
+            return redirect()->intended(route('rol.seleccionar'));
         }
 
         return back()->withErrors([

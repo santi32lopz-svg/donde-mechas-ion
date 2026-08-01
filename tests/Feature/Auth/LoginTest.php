@@ -25,9 +25,20 @@ class LoginTest extends TestCase
             'password' => 'admin123',
         ]);
 
-        $response->assertRedirect('/pos');
+        // El login ya no entra al POS: primero se elige con qué rol se trabaja,
+        // porque un usuario puede administrar un negocio y ser cajero de otro.
+        $response->assertRedirect(route('rol.seleccionar'));
         $this->assertAuthenticated();
-        $this->assertEquals(1, session('tenant_id'));
+
+        // No se compara contra un id fijo: la secuencia de PostgreSQL avanza
+        // entre pruebas y "1" solo acertaba por casualidad.
+        $negocio = User::query()
+            ->where('email', 'admin@dondemechas.com')
+            ->firstOrFail()
+            ->negociosDisponibles()
+            ->firstOrFail();
+
+        $this->assertEquals($negocio->id, session('tenant_id'));
         $this->assertEquals('Donde Mechas', session('tenant_nombre'));
     }
 
@@ -106,7 +117,7 @@ class LoginTest extends TestCase
         $this->post('/login', [
             'email' => 'admin@dondemechas.com',
             'password' => 'admin123',
-        ])->assertRedirect('/pos');
+        ])->assertRedirect(route('rol.seleccionar'));
 
         // Se elige uno por defecto; el selector superior permitirá cambiarlo.
         $this->assertContains(

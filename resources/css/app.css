@@ -556,3 +556,263 @@ body {
         border-radius: 0;
     }
 }
+/* ==========================================
+   PANEL DE ADMINISTRACIÓN
+   Reutiliza los tokens --pos-* del tema Dark Touch para que el panel y la
+   terminal se sientan el mismo producto.
+   ========================================== */
+:root {
+    --admin-topbar-height: 60px;
+    --admin-sidebar-width: 252px;
+}
+
+.admin-body {
+    background-color: var(--pos-bg-main);
+    color: var(--pos-text-main);
+    min-height: 100vh;
+}
+
+/* ===== Barra superior ===== */
+.admin-topbar {
+    height: var(--admin-topbar-height);
+    background-color: var(--pos-bg-surface);
+    border-bottom: 1px solid var(--pos-border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+}
+
+.admin-toggle,
+.admin-selector {
+    background-color: var(--pos-bg-main);
+    border: 1px solid var(--pos-border-color);
+    color: var(--pos-text-main);
+    border-radius: var(--radius-touch);
+    min-height: 44px;
+}
+
+.admin-selector:hover { color: var(--pos-text-main); border-color: var(--pos-primary); }
+
+.admin-btn-pos {
+    background-color: transparent;
+    border: 1px solid var(--pos-primary);
+    color: var(--pos-primary);
+    border-radius: var(--radius-touch);
+    min-height: 44px;
+    font-weight: 600;
+}
+.admin-btn-pos:hover { background-color: rgba(255, 107, 0, 0.12); color: var(--pos-primary); }
+
+.admin-btn-secundario {
+    background-color: var(--pos-bg-surface);
+    border: 1px solid var(--pos-border-color);
+    color: var(--pos-text-main);
+}
+.admin-btn-secundario:hover { border-color: var(--pos-primary); color: var(--pos-text-main); }
+
+/* ===== Estructura ===== */
+.admin-shell {
+    display: flex;
+    align-items: flex-start;
+    min-height: calc(100vh - var(--admin-topbar-height));
+}
+
+.admin-sidebar {
+    width: var(--admin-sidebar-width);
+    flex: 0 0 var(--admin-sidebar-width);
+    background-color: var(--pos-bg-card);
+    border-right: 1px solid var(--pos-border-color);
+    min-height: calc(100vh - var(--admin-topbar-height));
+    position: sticky;
+    top: var(--admin-topbar-height);
+    padding: 12px 0;
+}
+
+.admin-sidebar-header {
+    padding: 6px 16px 14px;
+    border-bottom: 1px solid var(--pos-border-color);
+    margin-bottom: 10px;
+}
+
+.admin-logo {
+    background-color: var(--pos-warning);
+    color: #121417;
+    border-radius: 8px;
+    padding: 2px 8px;
+}
+
+.admin-nav { list-style: none; margin: 0; padding: 0 10px; }
+
+.admin-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px; /* Mínimo táctil de la guía de estilos */
+    padding: 0 14px;
+    border-radius: var(--radius-touch);
+    color: var(--pos-text-muted);
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.admin-nav-link i { width: 20px; text-align: center; }
+.admin-nav-link:hover { background-color: var(--pos-bg-surface); color: var(--pos-text-main); }
+
+.admin-nav-link.active {
+    background-color: rgba(255, 107, 0, 0.14);
+    color: var(--pos-primary);
+    box-shadow: inset 3px 0 0 var(--pos-primary);
+}
+
+.admin-content { flex: 1 1 auto; min-width: 0; padding: 24px; }
+
+/* ===== Encabezados y paneles ===== */
+.admin-encabezado {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.admin-titulo { font-family: 'Montserrat', sans-serif; font-weight: 800; color: var(--pos-text-main); margin: 0; }
+.admin-subtitulo { color: var(--pos-text-muted); margin: 4px 0 0; }
+
+.admin-panel {
+    background-color: var(--pos-bg-card);
+    border: 1px solid var(--pos-border-color);
+    border-radius: var(--radius-touch);
+    padding: 20px;
+}
+
+.admin-panel-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--pos-text-main);
+    margin: 0 0 16px;
+}
+
+.admin-error { color: var(--pos-danger); font-size: 0.875rem; margin: 6px 0 0; }
+
+.admin-logo-pendiente {
+    border: 1px dashed var(--pos-border-color);
+    border-radius: var(--radius-touch);
+    padding: 14px;
+    color: var(--pos-text-muted);
+    background-color: var(--pos-bg-surface);
+}
+
+.admin-alerta-exito,
+.admin-alerta-aviso {
+    border-radius: var(--radius-touch);
+    border: 1px solid;
+    margin-bottom: 20px;
+}
+.admin-alerta-exito { background-color: rgba(0, 230, 118, 0.12); border-color: var(--pos-success); color: var(--pos-success); }
+.admin-alerta-aviso { background-color: rgba(0, 180, 216, 0.12); border-color: var(--pos-secondary); color: var(--pos-secondary); }
+
+/* ===== Métricas ===== */
+.admin-metricas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 16px;
+}
+
+.admin-metrica {
+    background-color: var(--pos-bg-card);
+    border: 1px solid var(--pos-border-color);
+    border-radius: var(--radius-touch);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.admin-metrica-valor { font-family: 'Montserrat', sans-serif; font-size: 1.9rem; font-weight: 800; color: var(--pos-primary); }
+.admin-metrica-texto { color: var(--pos-text-muted); font-size: 0.9rem; }
+
+/* ===== Tarjetas de negocio ===== */
+.admin-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.admin-tarjeta {
+    background-color: var(--pos-bg-card);
+    border: 1px solid var(--pos-border-color);
+    border-radius: var(--radius-touch);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.admin-tarjeta:hover { border-color: var(--pos-primary); transform: translateY(-2px); }
+.admin-tarjeta.activa { border-color: var(--pos-success); }
+
+.admin-tarjeta-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-touch);
+    background-color: var(--pos-bg-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--pos-primary);
+    font-size: 1.3rem;
+    margin-bottom: 14px;
+}
+
+.admin-tarjeta-titulo { font-size: 1.15rem; font-weight: 700; color: var(--pos-text-main); margin: 0 0 6px; }
+.admin-tarjeta-texto { color: var(--pos-text-muted); font-size: 0.92rem; flex-grow: 1; margin-bottom: 14px; }
+.admin-tarjeta-acciones { display: flex; gap: 8px; }
+
+/* ===== Pantallas de selección (rol y negocio) ===== */
+.pantalla-seleccion { max-width: 780px; }
+
+.tarjetas-rol {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+}
+
+.tarjeta-rol {
+    background-color: var(--pos-bg-card);
+    border: 2px solid var(--pos-border-color);
+    border-radius: var(--radius-touch);
+    padding: 28px 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    color: var(--pos-text-main);
+    transition: all 0.15s ease;
+    min-height: 200px;
+    justify-content: center;
+}
+
+.tarjeta-rol:hover { border-color: var(--pos-primary); transform: translateY(-3px); }
+.tarjeta-rol:active { transform: scale(0.97); }
+
+.tarjeta-rol-icono { font-size: 2.2rem; color: var(--pos-primary); }
+.tarjeta-rol-titulo { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.25rem; }
+.tarjeta-rol-texto { color: var(--pos-text-muted); font-size: 0.9rem; }
+
+/* ===== Responsive del panel ===== */
+@media (max-width: 991.98px) {
+    .admin-sidebar.offcanvas-lg {
+        --bs-offcanvas-width: var(--admin-sidebar-width);
+        --bs-offcanvas-bg: var(--pos-bg-card);
+        --bs-offcanvas-border-color: var(--pos-border-color);
+        position: fixed;
+        min-height: 100%;
+    }
+    .admin-content { padding: 16px; }
+}

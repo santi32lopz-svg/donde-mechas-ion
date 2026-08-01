@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\Negocio;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -69,6 +70,16 @@ class TenantContext
     }
 
     /**
+     * Modelo del negocio activo, o null si no hay ninguno.
+     */
+    public function negocio(): ?Negocio
+    {
+        $id = $this->negocioId();
+
+        return $id === null ? null : Negocio::query()->find($id);
+    }
+
+    /**
      * Indica si las consultas deben filtrarse por negocio.
      *
      * En consola, seeders, tests sin sesión y la propia pantalla de login no
@@ -132,6 +143,12 @@ class TenantContext
 
         if (is_int($enSesion) && $this->usuarioPuedeAcceder($usuario, $enSesion)) {
             return $enSesion;
+        }
+
+        // El superadministrador alcanza todos los negocios, así que elegir uno
+        // por él sería arbitrario: debe seleccionarlo explícitamente.
+        if ($usuario->esSuperadmin()) {
+            return null;
         }
 
         return $usuario->negociosDisponibles()->value('negocios.id');

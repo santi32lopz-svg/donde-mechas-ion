@@ -43,7 +43,13 @@ class EstablecerNegocioActivo
             session()->forget(TenantContext::CLAVE_SESION);
         }
 
-        $this->tenant->usar($usuario->negociosDisponibles()->value('negocios.id'));
+        // Al superadministrador no se le asigna ninguno: los alcanza todos y
+        // elegir por él sería arbitrario.
+        $this->tenant->usar(
+            $usuario->esSuperadmin()
+                ? null
+                : $usuario->negociosDisponibles()->value('negocios.id')
+        );
 
         return $next($request);
     }

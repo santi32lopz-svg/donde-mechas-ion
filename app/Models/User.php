@@ -50,6 +50,26 @@ class User extends Authenticatable
     }
 
     /**
+     * Negocios que el usuario puede ver y elegir como negocio activo.
+     *
+     * Devuelve una consulta y no una colección para que quien la use pueda
+     * seguir filtrando o paginando: la plataforma debe aguantar mil negocios.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<Negocio>
+     */
+    public function negociosVisibles(): \Illuminate\Database\Eloquent\Builder
+    {
+        if ($this->esSuperadmin()) {
+            return Negocio::query();
+        }
+
+        return Negocio::query()->whereIn(
+            'id',
+            $this->negociosDisponibles()->select('negocios.id')
+        );
+    }
+
+    /**
      * Un superadministrador alcanza cualquier negocio; el resto, solo aquellos
      * en los que tenga un vínculo activo.
      */

@@ -67,6 +67,18 @@ class MenuInicialSeeder extends Seeder
                 'activo' => true,
             ]);
 
+            // Superadministrador de plataforma: administra el sistema completo y
+            // crea negocios nuevos. A propósito SIN vínculos en negocio_usuario,
+            // porque alcanza todos los negocios por su rol y debe elegir sobre
+            // cuál trabaja en lugar de arrastrar uno asignado.
+            User::create([
+                'nombre'   => 'Super Administrador',
+                'email'    => 'superadmin@dondemechas.com',
+                'password' => Hash::make('super123'),
+                'rol'      => RolUsuario::Superadmin->value,
+                'activo'   => true,
+            ]);
+
             // -------------------------------------------------------------
             // 2. CATEGORÍAS DEL MENÚ
             // -------------------------------------------------------------
