@@ -49,6 +49,19 @@
                             @error('telefono') <p class="admin-error">{{ $message }}</p> @enderror
                         </div>
 
+                        <div class="col-12 col-md-6">
+                            <label class="form-label text-light fw-semibold" for="prefijo">Prefijo de pedidos</label>
+                            <input id="prefijo" type="text" wire:model="prefijoPedido" maxlength="8"
+                                   class="form-control form-control-touch" placeholder="{{ \App\Models\Negocio::PREFIJO_PEDIDO_POR_DEFECTO }}">
+                            @error('prefijoPedido') <p class="admin-error">{{ $message }}</p> @enderror
+                            <p class="small m-0 mt-1" style="color: var(--pos-text-muted);">
+                                Antecede al consecutivo en la tirilla. Si lo dejas vacío se usa
+                                <code class="admin-slug">{{ \App\Models\Negocio::PREFIJO_PEDIDO_POR_DEFECTO }}</code>.
+                                Solo afecta a la presentación, así que <strong>cambiarlo también
+                                cambia cómo se muestran los pedidos ya emitidos</strong>.
+                            </p>
+                        </div>
+
                         <div class="col-12">
                             <label class="form-label text-light fw-semibold" for="direccion">Dirección</label>
                             <textarea id="direccion" wire:model="direccion" rows="2"

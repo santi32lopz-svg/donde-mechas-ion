@@ -11,7 +11,27 @@ class Negocio extends Model
 {
     use HasFactory;
 
+    /** Prefijo de los pedidos cuando el negocio no ha configurado el suyo. */
+    public const PREFIJO_PEDIDO_POR_DEFECTO = 'PED';
+
     protected $guarded = [];
+
+    protected function casts(): array
+    {
+        return ['fecha_vencimiento' => 'datetime'];
+    }
+
+    /**
+     * Prefijo que antecede al consecutivo en la tirilla: DM-000123.
+     *
+     * Solo afecta a la presentación, así que cambiarlo no toca ningún pedido
+     * guardado. La contrapartida es que los pedidos antiguos pasan a mostrarse
+     * con el prefijo nuevo.
+     */
+    public function prefijoDePedido(): string
+    {
+        return trim((string) $this->prefijo_pedido) ?: self::PREFIJO_PEDIDO_POR_DEFECTO;
+    }
 
     public function usuarios(): BelongsToMany
     {

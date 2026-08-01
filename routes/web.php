@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Middleware\RequiereNegocioActivo;
+use App\Livewire\Admin\Caja;
 use App\Livewire\Admin\Configuracion;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Etiquetas;
+use App\Livewire\Admin\Pedidos;
 use App\Livewire\Admin\MiNegocio;
 use App\Livewire\Admin\Productos;
 use App\Livewire\Admin\Usuarios;
@@ -59,17 +61,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/productos', Productos\Index::class)->name('productos');
             Route::get('/usuarios', Usuarios\Index::class)->name('usuarios');
             Route::get('/configuracion', Configuracion::class)->name('configuracion');
-
-            // Módulos con la estructura reservada; se implementan por etapas.
-            $pendientes = [
-                'pedidos' => ['Pedidos', 'Historial de ventas del negocio.', 'fa-receipt'],
-                'caja' => ['Caja', 'Turnos, egresos y cuadre de caja.', 'fa-cash-register'],
-            ];
-
-            foreach ($pendientes as $ruta => [$titulo, $descripcion, $icono]) {
-                Route::get("/{$ruta}", fn () => view('admin.proximamente', compact('titulo', 'descripcion', 'icono')))
-                    ->name($ruta);
-            }
+            Route::get('/pedidos', Pedidos\Index::class)->name('pedidos');
+            Route::get('/caja', Caja\Index::class)->name('caja');
         });
     });
 });

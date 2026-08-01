@@ -2,14 +2,47 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToNegocio;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Línea de una venta.
+ *
+ * Guarda una copia del precio y del nombre del producto en el momento de
+ * venderlo. Sin esa copia, renombrar o cambiar el precio de un producto
+ * reescribiría el histórico en silencio.
+ */
 class DetallePedido extends Model
 {
-    protected $guarded = [];
+    use BelongsToNegocio;
 
-    public function negocio()
+    protected $fillable = [
+        'negocio_id',
+        'pedido_id',
+        'producto_id',
+        'nombre_producto',
+        'precio_unitario',
+        'cantidad',
+        'subtotal',
+    ];
+
+    protected function casts(): array
     {
-        return $this->belongsTo(Negocio::class);
+        return [
+            'precio_unitario' => 'decimal:2',
+            'subtotal' => 'decimal:2',
+            'cantidad' => 'integer',
+        ];
+    }
+
+    public function pedido(): BelongsTo
+    {
+        return $this->belongsTo(Pedido::class);
+    }
+
+    public function producto(): BelongsTo
+    {
+        return $this->belongsTo(Producto::class);
     }
 }

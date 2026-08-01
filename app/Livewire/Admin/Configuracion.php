@@ -27,6 +27,8 @@ class Configuracion extends Component
 
     public string $direccion = '';
 
+    public string $prefijoPedido = '';
+
     public ?string $mensajeExito = null;
 
     public function mount(): void
@@ -38,6 +40,7 @@ class Configuracion extends Component
         $this->nitRut = (string) $negocio?->nit_rut;
         $this->telefono = (string) $negocio?->telefono;
         $this->direccion = (string) $negocio?->direccion;
+        $this->prefijoPedido = (string) $negocio?->prefijo_pedido;
     }
 
     public function guardar(): void
@@ -50,9 +53,13 @@ class Configuracion extends Component
             'nitRut' => ['nullable', 'string', 'max:255'],
             'telefono' => ['nullable', 'string', 'max:255'],
             'direccion' => ['nullable', 'string', 'max:1000'],
+            // Solo letras y números: acaba impreso en la tirilla junto al
+            // consecutivo, y un separador ahí confundiría al leerlo.
+            'prefijoPedido' => ['nullable', 'string', 'max:8', 'regex:/^[A-Za-z0-9]+$/'],
         ], attributes: [
             'nombre' => 'nombre del negocio',
             'nitRut' => 'NIT o RUT',
+            'prefijoPedido' => 'prefijo de pedidos',
         ]);
 
         app(TenantContext::class)->negocio()->update([
@@ -61,6 +68,7 @@ class Configuracion extends Component
             'nit_rut' => $datos['nitRut'] ?: null,
             'telefono' => $datos['telefono'] ?: null,
             'direccion' => $datos['direccion'] ?: null,
+            'prefijo_pedido' => strtoupper($datos['prefijoPedido'] ?: '') ?: null,
         ]);
 
         // La barra superior lee el nombre de la sesión.
