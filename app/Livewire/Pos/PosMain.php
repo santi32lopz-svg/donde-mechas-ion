@@ -4,6 +4,7 @@ namespace App\Livewire\Pos;
 
 use App\Models\Categoria;
 use App\Models\Producto;
+use App\Support\TenantContext;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -46,12 +47,15 @@ class PosMain extends Component
 
     public function mount(): void
     {
-        $this->negocioId = auth()->user()?->negocio_id;
+        // El negocio ya no es un atributo del usuario sino el contexto de la
+        // petición: lo resuelve TenantContext a partir de la sesión. El POS es
+        // el mismo para todos los negocios y solo consume el que esté activo.
+        $this->negocioId = app(TenantContext::class)->negocioId();
 
         abort_if(
             $this->negocioId === null,
             403,
-            'Tu usuario no tiene un negocio asignado. Contacta al administrador.'
+            'No hay un negocio activo. Selecciona uno para abrir la terminal.'
         );
 
         $this->cart = $this->normalizarCarrito(session()->get($this->claveDeSesion(), []));

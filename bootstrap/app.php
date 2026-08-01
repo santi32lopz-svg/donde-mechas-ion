@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EstablecerNegocioActivo;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,7 +13,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Resuelve el negocio activo antes de que ningún componente consulte
+        // datos, de modo que el scope global no tenga que hacerlo por consulta.
+        $middleware->web(append: [
+            EstablecerNegocioActivo::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

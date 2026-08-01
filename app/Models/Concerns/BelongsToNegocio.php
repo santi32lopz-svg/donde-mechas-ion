@@ -3,10 +3,10 @@
 namespace App\Models\Concerns;
 
 use App\Models\Negocio;
+use App\Support\TenantContext;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * Aísla los registros por negocio en el SaaS multi-tenant.
@@ -31,26 +31,27 @@ trait BelongsToNegocio
     public static function bootBelongsToNegocio(): void
     {
         static::addGlobalScope('negocio', function (Builder $query): void {
-            $usuario = Auth::user();
+            $tenant = app(TenantContext::class);
 
-            if ($usuario === null) {
+            if (! $tenant->aplicaAislamiento()) {
                 return;
             }
 
+            $negocioId = $tenant->negocioId();
             $columna = $query->getModel()->getTable().'.negocio_id';
 
-            if ($usuario->negocio_id === null) {
+            if ($negocioId === null) {
                 $query->whereRaw('1 = 0');
 
                 return;
             }
 
-            $query->where($columna, $usuario->negocio_id);
+            $query->where($columna, $negocioId);
         });
 
         static::creating(function (Model $model): void {
             if ($model->negocio_id === null) {
-                $model->negocio_id = Auth::user()?->negocio_id;
+                $model->negocio_id = app(TenantContext::class)->negocioId();
             }
         });
     }
