@@ -149,7 +149,16 @@
                     @foreach($lineas as $item)
                         <div class="pos-ticket-item" wire:key="cart-item-{{ $item['id'] }}">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="fw-bold text-white pe-2">{{ $item['nombre'] }}</span>
+                                <span class="fw-bold text-white pe-2">
+                                    {{ $item['nombre'] }}
+                                    @unless($item['disponible'])
+                                        {{-- Se puede cobrar igual: lo más probable es que ya esté
+                                             servido. Queda registrado en la línea del pedido. --}}
+                                        <span class="badge badge-status-pending d-block mt-1">
+                                            <i class="fa-solid fa-triangle-exclamation me-1"></i>Ya no disponible
+                                        </span>
+                                    @endunless
+                                </span>
                                 <span class="fw-bold" style="color: var(--pos-primary);">
                                     ${{ number_format($item['subtotal'], 0, ',', '.') }}
                                 </span>
@@ -188,8 +197,25 @@
                     <span class="fs-4 fw-bold text-white">TOTAL</span>
                     <span class="fs-3 fw-bolder" style="color: var(--pos-primary);">${{ number_format($total, 0, ',', '.') }}</span>
                 </div>
+                @if($mensajeExito)
+                    <div class="alert admin-alerta-exito d-flex align-items-center gap-2 py-2" role="alert">
+                        <i class="fa-solid fa-circle-check"></i>{{ $mensajeExito }}
+                    </div>
+                @endif
+
+                @if($mensajeError)
+                    <div class="alert admin-alerta-error d-flex align-items-start gap-2 py-2" role="alert">
+                        <i class="fa-solid fa-triangle-exclamation mt-1"></i>
+                        <span>{{ $mensajeError }}</span>
+                    </div>
+                @endif
+
                 <button
                     type="button"
+                    wire:click="cobrar"
+                    wire:confirm="¿Registrar la venta por ${{ number_format($total, 0, ',', '.') }} en efectivo?"
+                    wire:loading.attr="disabled"
+                    wire:target="cobrar"
                     class="btn btn-touch btn-touch-primary w-100"
                     @disabled($lineas->isEmpty())
                 >

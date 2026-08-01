@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Pos;
 
+use App\Exceptions\VentaNoRegistrable;
 use App\Models\Etiqueta;
 use App\Models\Producto;
+use App\Support\RegistroDeVenta;
 use App\Support\TenantContext;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Locked;
@@ -44,6 +46,11 @@ class PosMain extends Component
     public string $search = '';
 
     public ?int $etiquetaSeleccionadaId = null;
+
+    /** Avisos del cobro. En propiedades: un flash no se ve sin recargar. */
+    public ?string $mensajeExito = null;
+
+    public ?string $mensajeError = null;
 
     public function mount(): void
     {
@@ -149,6 +156,39 @@ class PosMain extends Component
     }
 
     /**
+     * Registra la venta del carrito actual.
+     *
+     * La lógica vive en RegistroDeVenta: la Fase 2 prevé registrar pedidos
+     * desde WhatsApp y duplicarla aquí obligaría a mantener dos copias.
+     *
+     * En esta etapa se cobra en efectivo directamente. El diálogo con métodos
+     * de pago y numpad llega en la siguiente.
+     */
+    public function cobrar(string $metodoPago = 'efectivo'): void
+    {
+        $this->mensajeError = null;
+        $this->mensajeExito = null;
+
+        try {
+            $pedido = app(RegistroDeVenta::class)->registrar($this->cart, $metodoPago);
+        } catch (VentaNoRegistrable $e) {
+            // Regla de negocio, no fallo: el cajero necesita saber qué hacer.
+            $this->mensajeError = $e->getMessage();
+
+            return;
+        }
+
+        $this->cart = [];
+        session()->forget($this->claveDeSesion());
+
+        $this->mensajeExito = sprintf(
+            'Pedido %s cobrado por $%s.',
+            $pedido->numeroFormateado(),
+            number_format((float) $pedido->monto_total, 0, ',', '.'),
+        );
+    }
+
+    /**
      * Vacía el carrito por completo (cancelar pedido / limpieza pos-venta).
      */
     public function clearCart(): void
@@ -187,13 +227,15 @@ class PosMain extends Component
             return collect();
         }
 
+        // Sin filtrar por disponible: si un producto se oculta del POS mientras
+        // el cliente espera, lo más probable es que ya esté servido. Se queda en
+        // la tirilla marcado, y al cobrar se deja constancia en la línea.
         $productos = Producto::query()
             ->whereIn('id', array_keys($this->cart))
-            ->where('disponible', true)
             ->get()
             ->keyBy('id');
 
-        // Un producto puede haberse dado de baja mientras estaba en el carrito.
+        // Solo se purga lo que ya no existe: sin producto no hay precio.
         $huerfanos = array_diff(array_keys($this->cart), $productos->keys()->all());
 
         if ($huerfanos !== []) {
@@ -215,6 +257,7 @@ class PosMain extends Component
                     'cantidad' => $item['cantidad'],
                     'subtotal' => $precio * $item['cantidad'],
                     'notas' => $item['notas'],
+                    'disponible' => (bool) $productos[$id]->disponible,
                 ];
             })
             ->values();

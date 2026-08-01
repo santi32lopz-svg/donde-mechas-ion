@@ -22,6 +22,7 @@ class DetallePedido extends Model
         'pedido_id',
         'producto_id',
         'nombre_producto',
+        'vendido_sin_disponibilidad',
         'precio_unitario',
         'cantidad',
         'subtotal',
@@ -33,6 +34,7 @@ class DetallePedido extends Model
             'precio_unitario' => 'decimal:2',
             'subtotal' => 'decimal:2',
             'cantidad' => 'integer',
+            'vendido_sin_disponibilidad' => 'boolean',
         ];
     }
 
