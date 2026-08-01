@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Middleware\RequiereNegocioActivo;
 use App\Livewire\Admin\Dashboard;
+use App\Livewire\Admin\Etiquetas;
 use App\Livewire\Admin\MiNegocio;
 use App\Livewire\Auth\SeleccionNegocio;
 use App\Livewire\Auth\SeleccionRol;
@@ -51,11 +52,11 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/', Dashboard::class)->name('dashboard');
             Route::get('/mi-negocio', MiNegocio\Index::class)->name('mi-negocio');
+            Route::get('/etiquetas', Etiquetas\Index::class)->name('etiquetas');
 
             // Módulos con la estructura reservada; se implementan por etapas.
             $pendientes = [
                 'productos' => ['Productos', 'Catálogo del negocio activo.', 'fa-burger'],
-                'etiquetas' => ['Etiquetas', 'Agrupan los productos en el POS.', 'fa-tags'],
                 'pedidos' => ['Pedidos', 'Historial de ventas del negocio.', 'fa-receipt'],
                 'caja' => ['Caja', 'Turnos, egresos y cuadre de caja.', 'fa-cash-register'],
                 'usuarios' => ['Usuarios', 'Quién puede entrar y con qué rol.', 'fa-users'],

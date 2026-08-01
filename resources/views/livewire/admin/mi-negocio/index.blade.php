@@ -9,6 +9,12 @@
         </button>
     </div>
 
+    @if($mensajeExito)
+        <div class="alert admin-alerta-exito d-flex align-items-center gap-2" role="alert">
+            <i class="fa-solid fa-circle-check"></i>{{ $mensajeExito }}
+        </div>
+    @endif
+
     {{-- ============ FORMULARIO ============ --}}
     @if($mostrandoFormulario)
         <div class="admin-panel mb-4">

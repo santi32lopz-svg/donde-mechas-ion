@@ -34,6 +34,9 @@ class Index extends Component
 
     public string $estado = 'prueba';
 
+    /** En Livewire un flash no se ve hasta recargar el layout; ver EtiquetasIndex. */
+    public ?string $mensajeExito = null;
+
     public function abrirFormulario(?int $negocioId = null): void
     {
         $this->resetValidation();
@@ -85,7 +88,7 @@ class Index extends Component
                 'estado_suscripcion' => $datos['estado'],
             ]);
 
-            session()->flash('exito', 'Negocio actualizado.');
+            $this->mensajeExito = 'Negocio actualizado.';
         } else {
             $negocio = Negocio::create([
                 'nombre' => $datos['nombre'],
@@ -104,7 +107,7 @@ class Index extends Component
                 ]);
             }
 
-            session()->flash('exito', "Negocio «{$negocio->nombre}» creado.");
+            $this->mensajeExito = "Negocio «{$negocio->nombre}» creado.";
         }
 
         $this->cancelar();
