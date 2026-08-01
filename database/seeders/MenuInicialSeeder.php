@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Enums\RolUsuario;
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use App\Models\Categoria;
+use App\Models\Etiqueta;
 use App\Models\Producto;
 use App\Models\Insumo;
 use App\Models\RecetaProducto;
@@ -80,13 +80,13 @@ class MenuInicialSeeder extends Seeder
             ]);
 
             // -------------------------------------------------------------
-            // 2. CATEGORÍAS DEL MENÚ
+            // 2. ETIQUETAS DEL MENÚ
             // -------------------------------------------------------------
-            $catHamburguesas = Categoria::create(['negocio_id' => $negocioId, 'nombre' => 'Hamburguesas', 'orden_visualizacion' => 1, 'activo' => true]);
-            $catSalchipapas  = Categoria::create(['negocio_id' => $negocioId, 'nombre' => 'Salchipapas', 'orden_visualizacion' => 2, 'activo' => true]);
-            $catPerros       = Categoria::create(['negocio_id' => $negocioId, 'nombre' => 'Perros Calientes', 'orden_visualizacion' => 3, 'activo' => true]);
-            $catEmpanadas    = Categoria::create(['negocio_id' => $negocioId, 'nombre' => 'Empanadas', 'orden_visualizacion' => 4, 'activo' => true]);
-            $catBebidas      = Categoria::create(['negocio_id' => $negocioId, 'nombre' => 'Bebidas', 'orden_visualizacion' => 5, 'activo' => true]);
+            $etqHamburguesas = Etiqueta::create(['negocio_id' => $negocioId, 'nombre' => 'Hamburguesas', 'orden_visualizacion' => 1, 'activo' => true]);
+            $etqSalchipapas  = Etiqueta::create(['negocio_id' => $negocioId, 'nombre' => 'Salchipapas', 'orden_visualizacion' => 2, 'activo' => true]);
+            $etqPerros       = Etiqueta::create(['negocio_id' => $negocioId, 'nombre' => 'Perros Calientes', 'orden_visualizacion' => 3, 'activo' => true]);
+            $etqEmpanadas    = Etiqueta::create(['negocio_id' => $negocioId, 'nombre' => 'Empanadas', 'orden_visualizacion' => 4, 'activo' => true]);
+            $etqBebidas      = Etiqueta::create(['negocio_id' => $negocioId, 'nombre' => 'Bebidas', 'orden_visualizacion' => 5, 'activo' => true]);
 
             // -------------------------------------------------------------
             // 3. INSUMOS CONTABLES (MATERIA PRIMA CON GRAMAJES Y UNIDADES)
@@ -121,41 +121,41 @@ class MenuInicialSeeder extends Seeder
             // -------------------------------------------------------------
 
             // --- A. HAMBURGUESAS ---
-            $hSencilla = Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catHamburguesas->id, 'nombre' => 'Hamburguesa Sencilla', 'precio' => 12500.00, 'disponible' => true]);
+            $hSencilla = Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqHamburguesas->id, 'nombre' => 'Hamburguesa Sencilla', 'precio' => 12500.00, 'disponible' => true]);
             RecetaProducto::create(['producto_id' => $hSencilla->id, 'insumo_id' => $insumosData['pan_brioche']->id, 'cantidad_usada' => 1]);
             RecetaProducto::create(['producto_id' => $hSencilla->id, 'insumo_id' => $insumosData['carne_120g']->id, 'cantidad_usada' => 1]);
 
-            $hEspecial = Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catHamburguesas->id, 'nombre' => 'Hamburguesa Especial', 'precio' => 17000.00, 'disponible' => true]);
+            $hEspecial = Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqHamburguesas->id, 'nombre' => 'Hamburguesa Especial', 'precio' => 17000.00, 'disponible' => true]);
             RecetaProducto::create(['producto_id' => $hEspecial->id, 'insumo_id' => $insumosData['pan_brioche']->id, 'cantidad_usada' => 1]);
             RecetaProducto::create(['producto_id' => $hEspecial->id, 'insumo_id' => $insumosData['carne_120g']->id, 'cantidad_usada' => 1]);
             RecetaProducto::create(['producto_id' => $hEspecial->id, 'insumo_id' => $insumosData['tocineta']->id, 'cantidad_usada' => 80]);
             RecetaProducto::create(['producto_id' => $hEspecial->id, 'insumo_id' => $insumosData['huevo']->id, 'cantidad_usada' => 1]);
 
-            $hTrifasica = Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catHamburguesas->id, 'nombre' => 'Hamburguesa Trifásica', 'precio' => 22310.00, 'disponible' => true]);
+            $hTrifasica = Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqHamburguesas->id, 'nombre' => 'Hamburguesa Trifásica', 'precio' => 22310.00, 'disponible' => true]);
             RecetaProducto::create(['producto_id' => $hTrifasica->id, 'insumo_id' => $insumosData['pan_brioche']->id, 'cantidad_usada' => 1]);
             RecetaProducto::create(['producto_id' => $hTrifasica->id, 'insumo_id' => $insumosData['carne_120g']->id, 'cantidad_usada' => 2]);
             RecetaProducto::create(['producto_id' => $hTrifasica->id, 'insumo_id' => $insumosData['tocineta']->id, 'cantidad_usada' => 80]);
             RecetaProducto::create(['producto_id' => $hTrifasica->id, 'insumo_id' => $insumosData['huevo']->id, 'cantidad_usada' => 1]);
 
             // COMBOS HAMBURGUESAS
-            Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catHamburguesas->id, 'nombre' => 'Combo Hamburguesa Sencilla', 'precio' => 18500.00, 'disponible' => true]);
-            Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catHamburguesas->id, 'nombre' => 'Combo Hamburguesa Especial', 'precio' => 23000.00, 'disponible' => true]);
-            Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catHamburguesas->id, 'nombre' => 'Combo Hamburguesa Trifásica', 'precio' => 28310.00, 'disponible' => true]);
+            Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqHamburguesas->id, 'nombre' => 'Combo Hamburguesa Sencilla', 'precio' => 18500.00, 'disponible' => true]);
+            Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqHamburguesas->id, 'nombre' => 'Combo Hamburguesa Especial', 'precio' => 23000.00, 'disponible' => true]);
+            Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqHamburguesas->id, 'nombre' => 'Combo Hamburguesa Trifásica', 'precio' => 28310.00, 'disponible' => true]);
 
             // --- B. SALCHIPAPAS ---
-            $sSencilla = Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catSalchipapas->id, 'nombre' => 'Salchipapa Sencilla', 'precio' => 12000.00, 'disponible' => true]);
+            $sSencilla = Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqSalchipapas->id, 'nombre' => 'Salchipapa Sencilla', 'precio' => 12000.00, 'disponible' => true]);
             RecetaProducto::create(['producto_id' => $sSencilla->id, 'insumo_id' => $insumosData['papa_frita']->id, 'cantidad_usada' => 200]);
             RecetaProducto::create(['producto_id' => $sSencilla->id, 'insumo_id' => $insumosData['salchicha_picada']->id, 'cantidad_usada' => 62]);
             RecetaProducto::create(['producto_id' => $sSencilla->id, 'insumo_id' => $insumosData['chorizo']->id, 'cantidad_usada' => 42]);
 
-            $sEspecial = Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catSalchipapas->id, 'nombre' => 'Salchipapa Especial', 'precio' => 20000.00, 'disponible' => true]);
+            $sEspecial = Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqSalchipapas->id, 'nombre' => 'Salchipapa Especial', 'precio' => 20000.00, 'disponible' => true]);
             RecetaProducto::create(['producto_id' => $sEspecial->id, 'insumo_id' => $insumosData['papa_frita']->id, 'cantidad_usada' => 300]);
             RecetaProducto::create(['producto_id' => $sEspecial->id, 'insumo_id' => $insumosData['salchicha_picada']->id, 'cantidad_usada' => 93]);
             RecetaProducto::create(['producto_id' => $sEspecial->id, 'insumo_id' => $insumosData['chorizo']->id, 'cantidad_usada' => 84]);
             RecetaProducto::create(['producto_id' => $sEspecial->id, 'insumo_id' => $insumosData['tocineta']->id, 'cantidad_usada' => 80]);
             RecetaProducto::create(['producto_id' => $sEspecial->id, 'insumo_id' => $insumosData['pollo_desmechado']->id, 'cantidad_usada' => 80]);
 
-            $sTrifasica = Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catSalchipapas->id, 'nombre' => 'Salchipapa Trifásica', 'precio' => 30000.00, 'disponible' => true]);
+            $sTrifasica = Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqSalchipapas->id, 'nombre' => 'Salchipapa Trifásica', 'precio' => 30000.00, 'disponible' => true]);
             RecetaProducto::create(['producto_id' => $sTrifasica->id, 'insumo_id' => $insumosData['papa_frita']->id, 'cantidad_usada' => 400]);
             RecetaProducto::create(['producto_id' => $sTrifasica->id, 'insumo_id' => $insumosData['salchicha_picada']->id, 'cantidad_usada' => 114]);
             RecetaProducto::create(['producto_id' => $sTrifasica->id, 'insumo_id' => $insumosData['chorizo']->id, 'cantidad_usada' => 126]);
@@ -164,45 +164,45 @@ class MenuInicialSeeder extends Seeder
             RecetaProducto::create(['producto_id' => $sTrifasica->id, 'insumo_id' => $insumosData['costilla_bbq']->id, 'cantidad_usada' => 100]);
 
             // COMBOS SALCHIPAPAS
-            Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catSalchipapas->id, 'nombre' => 'Combo Salchipapa Sencilla', 'precio' => 14500.00, 'disponible' => true]);
-            Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catSalchipapas->id, 'nombre' => 'Combo Salchipapa Especial', 'precio' => 25000.00, 'disponible' => true]);
-            Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catSalchipapas->id, 'nombre' => 'Combo Salchipapa Trifásica', 'precio' => 37000.00, 'disponible' => true]);
+            Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqSalchipapas->id, 'nombre' => 'Combo Salchipapa Sencilla', 'precio' => 14500.00, 'disponible' => true]);
+            Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqSalchipapas->id, 'nombre' => 'Combo Salchipapa Especial', 'precio' => 25000.00, 'disponible' => true]);
+            Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqSalchipapas->id, 'nombre' => 'Combo Salchipapa Trifásica', 'precio' => 37000.00, 'disponible' => true]);
 
             // --- C. PERROS CALIENTES ---
-            $pSencillo = Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catPerros->id, 'nombre' => 'Perro Sencillo', 'precio' => 9000.00, 'disponible' => true]);
+            $pSencillo = Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqPerros->id, 'nombre' => 'Perro Sencillo', 'precio' => 9000.00, 'disponible' => true]);
             RecetaProducto::create(['producto_id' => $pSencillo->id, 'insumo_id' => $insumosData['pan_perro']->id, 'cantidad_usada' => 1]);
             RecetaProducto::create(['producto_id' => $pSencillo->id, 'insumo_id' => $insumosData['salchicha_jumbo']->id, 'cantidad_usada' => 1]);
 
-            $pChoriperro = Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catPerros->id, 'nombre' => 'Choriperro', 'precio' => 12000.00, 'disponible' => true]);
+            $pChoriperro = Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqPerros->id, 'nombre' => 'Choriperro', 'precio' => 12000.00, 'disponible' => true]);
             RecetaProducto::create(['producto_id' => $pChoriperro->id, 'insumo_id' => $insumosData['pan_perro']->id, 'cantidad_usada' => 1]);
             RecetaProducto::create(['producto_id' => $pChoriperro->id, 'insumo_id' => $insumosData['chorizo']->id, 'cantidad_usada' => 100]);
 
-            $pPerraPaisa = Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catPerros->id, 'nombre' => 'Perra Paisa', 'precio' => 15000.00, 'disponible' => true]);
+            $pPerraPaisa = Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqPerros->id, 'nombre' => 'Perra Paisa', 'precio' => 15000.00, 'disponible' => true]);
             RecetaProducto::create(['producto_id' => $pPerraPaisa->id, 'insumo_id' => $insumosData['pan_perro']->id, 'cantidad_usada' => 1]);
             RecetaProducto::create(['producto_id' => $pPerraPaisa->id, 'insumo_id' => $insumosData['tocineta']->id, 'cantidad_usada' => 150]);
 
             // COMBOS PERROS
-            Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catPerros->id, 'nombre' => 'Combo Perro Sencillo', 'precio' => 15000.00, 'disponible' => true]);
-            Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catPerros->id, 'nombre' => 'Combo Choriperro', 'precio' => 18000.00, 'disponible' => true]);
-            Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catPerros->id, 'nombre' => 'Combo Perra Paisa', 'precio' => 21000.00, 'disponible' => true]);
+            Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqPerros->id, 'nombre' => 'Combo Perro Sencillo', 'precio' => 15000.00, 'disponible' => true]);
+            Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqPerros->id, 'nombre' => 'Combo Choriperro', 'precio' => 18000.00, 'disponible' => true]);
+            Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqPerros->id, 'nombre' => 'Combo Perra Paisa', 'precio' => 21000.00, 'disponible' => true]);
 
             // --- D. EMPANADAS ---
-            $emp1 = Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catEmpanadas->id, 'nombre' => 'Empanada de Papa y Carne', 'precio' => 3500.00, 'disponible' => true]);
+            $emp1 = Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqEmpanadas->id, 'nombre' => 'Empanada de Papa y Carne', 'precio' => 3500.00, 'disponible' => true]);
             RecetaProducto::create(['producto_id' => $emp1->id, 'insumo_id' => $insumosData['emp_carne_papa']->id, 'cantidad_usada' => 1]);
 
-            $emp2 = Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catEmpanadas->id, 'nombre' => 'Empanada de Queso', 'precio' => 3500.00, 'disponible' => true]);
+            $emp2 = Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqEmpanadas->id, 'nombre' => 'Empanada de Queso', 'precio' => 3500.00, 'disponible' => true]);
             RecetaProducto::create(['producto_id' => $emp2->id, 'insumo_id' => $insumosData['emp_queso']->id, 'cantidad_usada' => 1]);
 
-            $emp3 = Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catEmpanadas->id, 'nombre' => 'Empanada Ranchera', 'precio' => 3500.00, 'disponible' => true]);
+            $emp3 = Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqEmpanadas->id, 'nombre' => 'Empanada Ranchera', 'precio' => 3500.00, 'disponible' => true]);
             RecetaProducto::create(['producto_id' => $emp3->id, 'insumo_id' => $insumosData['emp_ranchera']->id, 'cantidad_usada' => 1]);
 
-            $emp4 = Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catEmpanadas->id, 'nombre' => 'Empanada Pollo, Jamón y Queso', 'precio' => 3500.00, 'disponible' => true]);
+            $emp4 = Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqEmpanadas->id, 'nombre' => 'Empanada Pollo, Jamón y Queso', 'precio' => 3500.00, 'disponible' => true]);
             RecetaProducto::create(['producto_id' => $emp4->id, 'insumo_id' => $insumosData['emp_pollo_jq']->id, 'cantidad_usada' => 1]);
 
             // --- E. BEBIDAS ---
-            Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catBebidas->id, 'nombre' => 'Gaseosa Personal 350ml', 'precio' => 4000.00, 'disponible' => true]);
-            Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catBebidas->id, 'nombre' => 'Agua Embotellada', 'precio' => 3000.00, 'disponible' => true]);
-            Producto::create(['negocio_id' => $negocioId, 'categoria_id' => $catBebidas->id, 'nombre' => 'Jugo Natural', 'precio' => 5000.00, 'disponible' => true]);
+            Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqBebidas->id, 'nombre' => 'Gaseosa Personal 350ml', 'precio' => 4000.00, 'disponible' => true]);
+            Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqBebidas->id, 'nombre' => 'Agua Embotellada', 'precio' => 3000.00, 'disponible' => true]);
+            Producto::create(['negocio_id' => $negocioId, 'etiqueta_id' => $etqBebidas->id, 'nombre' => 'Jugo Natural', 'precio' => 5000.00, 'disponible' => true]);
 
             // --- CÓDIGOS DE BARRAS ---
             // La columna se añadió después de escribirse este seeder, así que

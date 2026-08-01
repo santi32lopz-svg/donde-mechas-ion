@@ -29,25 +29,25 @@
             </div>
         </div>
 
-        {{-- Navegación por Categorías (Tiles táctiles, min 60px alto) --}}
-        <div class="pos-category-grid mb-3">
+        {{-- Navegación por Etiquetas (Tiles táctiles, min 60px alto) --}}
+        <div class="pos-etiqueta-grid mb-3">
             <button
                 type="button"
-                wire:click="selectCategoria(null)"
-                class="pos-category-tile {{ is_null($selectedCategoriaId) ? 'active' : '' }}"
+                wire:click="seleccionarEtiqueta(null)"
+                class="pos-etiqueta-tile {{ is_null($etiquetaSeleccionadaId) ? 'active' : '' }}"
             >
                 <i class="fa-solid fa-border-all mb-1"></i>
                 <span>Todos</span>
             </button>
 
-            @foreach($categorias as $categoria)
+            @foreach($etiquetas as $etiqueta)
                 <button
                     type="button"
-                    wire:click="selectCategoria({{ $categoria->id }})"
-                    wire:key="categoria-{{ $categoria->id }}"
-                    class="pos-category-tile {{ $selectedCategoriaId === $categoria->id ? 'active' : '' }}"
+                    wire:click="seleccionarEtiqueta({{ $etiqueta->id }})"
+                    wire:key="etiqueta-{{ $etiqueta->id }}"
+                    class="pos-etiqueta-tile {{ $etiquetaSeleccionadaId === $etiqueta->id ? 'active' : '' }}"
                 >
-                    <span>{{ $categoria->nombre }}</span>
+                    <span>{{ $etiqueta->nombre }}</span>
                 </button>
             @endforeach
         </div>
@@ -85,7 +85,7 @@
                     <div class="pos-empty-state">
                         <i class="fa-solid fa-magnifying-glass fs-1 mb-3 d-block" style="color: var(--pos-text-muted);"></i>
                         <h5 class="text-white">No se encontraron productos</h5>
-                        <p class="small" style="color: var(--pos-text-muted);">Intenta con otro término o categoría.</p>
+                        <p class="small" style="color: var(--pos-text-muted);">Intenta con otro término o etiqueta.</p>
                     </div>
                 @endforelse
             </div>

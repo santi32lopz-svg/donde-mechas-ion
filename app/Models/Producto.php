@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\BelongsToNegocio;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Producto extends Model
 {
@@ -17,7 +18,7 @@ class Producto extends Model
      */
     protected $fillable = [
         'negocio_id',
-        'categoria_id',
+        'etiqueta_id',
         'nombre',
         'codigo_barras',
         'precio',
@@ -31,6 +32,15 @@ class Producto extends Model
             'precio' => 'decimal:2',
             'disponible' => 'boolean',
         ];
+    }
+
+    /**
+     * Cada producto pertenece a una sola etiqueta, que es la que agrupa la
+     * cuadrícula del POS.
+     */
+    public function etiqueta(): BelongsTo
+    {
+        return $this->belongsTo(Etiqueta::class);
     }
 
     /**

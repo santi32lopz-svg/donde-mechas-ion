@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Pos;
 
-use App\Models\Categoria;
+use App\Models\Etiqueta;
 use App\Models\Producto;
 use App\Support\TenantContext;
 use Illuminate\Support\Collection;
@@ -43,7 +43,7 @@ class PosMain extends Component
     // Filtros de búsqueda y navegación en el POS
     public string $search = '';
 
-    public ?int $selectedCategoriaId = null;
+    public ?int $etiquetaSeleccionadaId = null;
 
     public function mount(): void
     {
@@ -158,21 +158,21 @@ class PosMain extends Component
     }
 
     /**
-     * Selecciona o deselecciona una categoría.
+     * Selecciona o deselecciona una etiqueta.
      */
-    public function selectCategoria(?int $categoriaId = null): void
+    public function seleccionarEtiqueta(?int $etiquetaId = null): void
     {
-        $this->selectedCategoriaId = $this->selectedCategoriaId === $categoriaId ? null : $categoriaId;
+        $this->etiquetaSeleccionadaId = $this->etiquetaSeleccionadaId === $etiquetaId ? null : $etiquetaId;
     }
 
     /**
-     * Al buscar se suelta el filtro de categoría: si no, escribir "empanada"
+     * Al buscar se suelta el filtro de etiqueta: si no, escribir "empanada"
      * con "Hamburguesas" activa no devuelve nada y parece que el buscador falla.
      */
     public function updatedSearch(): void
     {
         if (trim($this->search) !== '') {
-            $this->selectedCategoriaId = null;
+            $this->etiquetaSeleccionadaId = null;
         }
     }
 
@@ -264,7 +264,7 @@ class PosMain extends Component
         $subtotal = (float) $lineas->sum('subtotal');
 
         // El scope global de negocio filtra por el tenant en sesión.
-        $categorias = Categoria::query()
+        $etiquetas = Etiqueta::query()
             ->where('activo', true)
             ->orderBy('orden_visualizacion')
             ->get();
@@ -273,14 +273,14 @@ class PosMain extends Component
             ->select('id', 'nombre', 'precio', 'imagen_path')
             ->where('disponible', true)
             ->buscar($this->search)
-            ->when($this->selectedCategoriaId, fn ($q) => $q->where('categoria_id', $this->selectedCategoriaId))
+            ->when($this->etiquetaSeleccionadaId, fn ($q) => $q->where('etiqueta_id', $this->etiquetaSeleccionadaId))
             ->orderBy('nombre')
             ->limit(self::MAX_PRODUCTOS)
             ->get();
 
         return view('livewire.pos.pos-main', [
             'productos' => $productos,
-            'categorias' => $categorias,
+            'etiquetas' => $etiquetas,
             'lineas' => $lineas,
             'subtotal' => $subtotal,
             // De momento el total es igual al subtotal; aquí entrarán impuestos si aplican.

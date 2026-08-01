@@ -4,7 +4,7 @@ namespace Tests\Feature\Pos;
 
 use App\Enums\RolUsuario;
 use App\Livewire\Pos\PosMain;
-use App\Models\Categoria;
+use App\Models\Etiqueta;
 use App\Models\Negocio;
 use App\Models\Producto;
 use App\Models\User;
@@ -121,13 +121,13 @@ class PosMainTest extends TestCase
             ->assertSet('cart', []);
     }
 
-    public function test_buscar_libera_el_filtro_de_categoria(): void
+    public function test_buscar_libera_el_filtro_de_etiqueta(): void
     {
         Livewire::actingAs($this->cajero)
             ->test(PosMain::class)
-            ->set('selectedCategoriaId', 999)
+            ->set('etiquetaSeleccionadaId', 999)
             ->set('search', 'hamb')
-            ->assertSet('selectedCategoriaId', null)
+            ->assertSet('etiquetaSeleccionadaId', null)
             ->assertSee('Hamburguesa Especial');
     }
 
@@ -143,16 +143,16 @@ class PosMainTest extends TestCase
 
     private function crearProducto(Negocio $negocio, string $nombre, int $precio, string $codigo): Producto
     {
-        $categoria = Categoria::create([
+        $etiqueta = Etiqueta::create([
             'negocio_id' => $negocio->id,
-            'nombre' => 'Categoría de '.$negocio->slug,
+            'nombre' => 'Etiqueta de '.$negocio->slug,
             'orden_visualizacion' => 1,
             'activo' => true,
         ]);
 
         return Producto::create([
             'negocio_id' => $negocio->id,
-            'categoria_id' => $categoria->id,
+            'etiqueta_id' => $etiqueta->id,
             'nombre' => $nombre,
             'codigo_barras' => $codigo,
             'precio' => $precio,

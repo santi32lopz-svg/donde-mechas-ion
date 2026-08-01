@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\RolUsuario;
-use App\Models\Categoria;
+use App\Models\Etiqueta;
 use App\Models\Negocio;
 use App\Models\Producto;
 use App\Models\User;
@@ -105,13 +105,13 @@ class TenantContextTest extends TestCase
         $tenant = app(TenantContext::class);
         $tenant->usar($this->negocioAjeno->id);
 
-        $categoria = Categoria::create([
+        $etiqueta = Etiqueta::create([
             'nombre' => 'Pizzas',
             'orden_visualizacion' => 1,
             'activo' => true,
         ]);
 
-        $this->assertSame($this->negocioAjeno->id, $categoria->negocio_id);
+        $this->assertSame($this->negocioAjeno->id, $etiqueta->negocio_id);
     }
 
     private function crearNegocio(string $nombre, string $slug): Negocio
@@ -126,16 +126,16 @@ class TenantContextTest extends TestCase
 
     private function crearProducto(Negocio $negocio, string $nombre): Producto
     {
-        $categoria = Categoria::create([
+        $etiqueta = Etiqueta::create([
             'negocio_id' => $negocio->id,
-            'nombre' => 'Categoría de '.$negocio->slug,
+            'nombre' => 'Etiqueta de '.$negocio->slug,
             'orden_visualizacion' => 1,
             'activo' => true,
         ]);
 
         return Producto::create([
             'negocio_id' => $negocio->id,
-            'categoria_id' => $categoria->id,
+            'etiqueta_id' => $etiqueta->id,
             'nombre' => $nombre,
             'precio' => 17000,
             'disponible' => true,

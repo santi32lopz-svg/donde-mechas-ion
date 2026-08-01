@@ -372,14 +372,14 @@ body {
     border-radius: 0 var(--radius-touch) var(--radius-touch) 0 !important;
 }
 
-/* ===== Categorías: tiles táctiles, altura mínima 60px ===== */
-.pos-category-grid {
+/* ===== Etiquetas: tiles táctiles, altura mínima 60px ===== */
+.pos-etiqueta-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 10px;
 }
 
-.pos-category-tile {
+.pos-etiqueta-tile {
     min-height: 60px;
     background-color: var(--pos-bg-card);
     border: 2px solid var(--pos-border-color);
@@ -395,17 +395,17 @@ body {
     transition: all 0.15s ease;
 }
 
-.pos-category-tile:active {
+.pos-etiqueta-tile:active {
     transform: scale(0.96);
 }
 
-.pos-category-tile.active {
+.pos-etiqueta-tile.active {
     border-color: var(--pos-primary);
     background-color: rgba(255, 107, 0, 0.15);
     color: var(--pos-primary);
 }
 
-.pos-category-tile:focus-visible {
+.pos-etiqueta-tile:focus-visible {
     outline: 3px solid var(--pos-primary);
     outline-offset: 2px;
 }
@@ -530,14 +530,14 @@ body {
     }
     .pos-product-grid { grid-template-columns: repeat(2, 1fr); }
     .pos-product-grid-wrapper { overflow-y: visible; }
-    .pos-category-grid {
+    .pos-etiqueta-grid {
         grid-auto-flow: column;
         grid-auto-columns: minmax(100px, auto);
         grid-template-columns: none;
         overflow-x: auto;
         scrollbar-width: none;
     }
-    .pos-category-grid::-webkit-scrollbar { display: none; }
+    .pos-etiqueta-grid::-webkit-scrollbar { display: none; }
 
     /* Tirilla como bottom drawer */
     .pos-ticket-col.offcanvas-md {

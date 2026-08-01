@@ -20,7 +20,7 @@ class Negocio extends Model
             ->withTimestamps();
     }
 
-    public function categorias() { return $this->hasMany(Categoria::class, 'negocio_id'); }
+    public function etiquetas() { return $this->hasMany(Etiqueta::class, 'negocio_id'); }
     public function productos() { return $this->hasMany(Producto::class, 'negocio_id'); }
     public function pedidos() { return $this->hasMany(Pedido::class, 'negocio_id'); }
     public function insumos() { return $this->hasMany(Insumo::class, 'negocio_id'); }

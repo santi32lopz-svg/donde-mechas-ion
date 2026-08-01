@@ -5,9 +5,9 @@
         <p class="text-muted">El área de trabajo principal (grilla de productos y carrito) irá aquí.</p>
         
         <div class="d-flex gap-3 mt-4">
-            <div class="tile-category active">🍔 Hamburguesas</div>
-            <div class="tile-category">🍟 Salchipapas</div>
-            <div class="tile-category">🥟 Empanadas</div>
+            <div class="tile-etiqueta active">🍔 Hamburguesas</div>
+            <div class="tile-etiqueta">🍟 Salchipapas</div>
+            <div class="tile-etiqueta">🥟 Empanadas</div>
         </div>
     </div>
 </x-app-layout>
