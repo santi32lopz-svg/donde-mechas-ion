@@ -1,7 +1,9 @@
 <?php
 
+use App\Enums\RolUsuario;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Middleware\RequiereNegocioActivo;
+use App\Http\Middleware\RequiereRol;
 use App\Livewire\Admin\Caja;
 use App\Livewire\Admin\Configuracion;
 use App\Livewire\Admin\Dashboard;
@@ -25,7 +27,11 @@ Route::get('/', function () {
 // Rutas de Autenticación
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login'])->name('login.store');
+    // Sin este freno se podían probar contraseñas indefinidamente contra un
+    // sistema que gestiona el dinero del negocio.
+    Route::post('/login', [LoginController::class, 'login'])
+        ->middleware('throttle:login')
+        ->name('login.store');
 });
 
 // Rutas Protegidas (Requieren Login)
@@ -54,7 +60,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/pos', PosMain::class)->name('pos.main');
 
         // --- Panel de administración ---
-        Route::prefix('admin')->name('admin.')->group(function () {
+        // Reservado a quien administra el negocio. Sin esta restricción un
+        // cajero podía escribir la URL y cambiar precios o darse permisos.
+        Route::middleware(RequiereRol::class.':'.RolUsuario::Administrador->value)
+            ->prefix('admin')->name('admin.')->group(function () {
             Route::get('/', Dashboard::class)->name('dashboard');
             Route::get('/mi-negocio', MiNegocio\Index::class)->name('mi-negocio');
             Route::get('/etiquetas', Etiquetas\Index::class)->name('etiquetas');
