@@ -41,22 +41,10 @@
                 <span id="pos-clock" class="fw-bold text-light">--:--:--</span>
             </div>
 
-            <!-- Botón de Egreso Rápido de Caja -->
-            <button class="btn btn-touch btn-touch-danger px-3" data-bs-toggle="modal" data-bs-target="#modalEgresoCaja">
-                <i class="fa-solid fa-hand-holding-dollar"></i>
-                <span class="d-none d-sm-inline">Salida Caja</span>
-            </button>
-
-            <!-- Indicador de Turno de Caja -->
-            <div class="pos-header-chip d-none d-lg-flex align-items-center gap-2">
-                <div class="spinner-grow spinner-grow-sm" style="color: var(--pos-success);" role="status">
-                    <span class="visually-hidden">Turno activo</span>
-                </div>
-                <div class="lh-1">
-                    <span class="d-block" style="font-size: 0.65rem; color: var(--pos-text-muted);">CAJA ABIERTA</span>
-                    <span class="fw-bold" style="color: var(--pos-success);">$150.000 (Base)</span>
-                </div>
-            </div>
+            {{-- Estado y operaciones de caja. Componente hermano de PosMain:
+                 no toca el carrito, así que no hay estado que sincronizar, y al
+                 no estar anidado queda fuera de su morphing. --}}
+            <livewire:pos.control-de-caja />
         </div>
 
         <!-- Perfil Cajero & Cierre -->

@@ -26,6 +26,7 @@ class TurnoCaja extends Model
         'estado',
         'fecha_apertura',
         'fecha_cierre',
+        'observaciones_apertura',
     ];
 
     protected function casts(): array

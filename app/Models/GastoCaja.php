@@ -17,6 +17,8 @@ class GastoCaja extends Model
     protected $fillable = [
         'negocio_id',
         'turno_caja_id',
+        'user_id',
+        'tipo',
         'descripcion',
         'monto',
     ];

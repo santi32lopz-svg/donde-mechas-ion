@@ -1087,3 +1087,53 @@ body {
     .pos-cobro { max-height: 100vh; border-radius: 0; }
     .pos-cobro-fondo { padding: 0; }
 }
+
+/* ===== Control de caja en la cabecera del POS ===== */
+.pos-caja-estado {
+    background-color: var(--pos-bg-main);
+    border: 1px solid var(--pos-success);
+    border-radius: 999px;
+    padding: 6px 14px;
+}
+
+.pos-caja-punto {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: var(--pos-success);
+    box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.2);
+}
+
+/* Verde y no naranja: abrir caja es habilitar, no cobrar */
+.pos-btn-abrir-caja {
+    background-color: var(--pos-success);
+    color: #06231a;
+    border: none;
+    font-weight: 700;
+}
+
+.pos-btn-abrir-caja:hover { background-color: #00c853; color: #06231a; }
+
+.pos-caja-aviso {
+    position: fixed;
+    top: calc(var(--pos-header-height) + 12px);
+    right: 16px;
+    z-index: 1080;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    max-width: 340px;
+    padding: 12px 16px;
+    border-radius: var(--radius-touch);
+    background-color: rgba(0, 230, 118, 0.14);
+    border: 1px solid var(--pos-success);
+    color: var(--pos-success);
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.pos-caja-aviso.error {
+    background-color: rgba(255, 56, 56, 0.14);
+    border-color: var(--pos-danger);
+    color: var(--pos-danger);
+}
