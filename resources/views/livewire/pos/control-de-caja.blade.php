@@ -4,12 +4,15 @@
          Solo estado operativo. Las cifras financieras viven en el cierre,
          el Dashboard y el Panel Operativo. --}}
     @if($turno)
+        {{-- Lo que importa mientras se vende es cuánto dinero hay en el cajón,
+             no con cuánto se abrió. La base se ve en el modal de cierre. --}}
         <div class="pos-caja-estado d-none d-md-flex align-items-center gap-2">
             <span class="pos-caja-punto"></span>
             <div class="lh-1">
-                <span class="d-block" style="font-size: 0.65rem; color: var(--pos-text-muted);">CAJA ABIERTA</span>
-                <span class="fw-bold" style="color: var(--pos-success);">
-                    Base ${{ number_format($turno->monto_apertura, 0, ',', '.') }}
+                <span class="d-block" style="font-size: 0.65rem; color: var(--pos-text-muted);">EFECTIVO EN CAJA</span>
+                <span class="fw-bold {{ $efectivoEsperado < 0 ? 'text-danger' : '' }}"
+                      style="{{ $efectivoEsperado < 0 ? '' : 'color: var(--pos-success);' }}">
+                    ${{ number_format($efectivoEsperado, 0, ',', '.') }}
                 </span>
             </div>
         </div>
@@ -28,9 +31,26 @@
         </button>
     @endif
 
-    {{-- ============ AVISOS ============ --}}
+    {{-- Salida del POS. Sin esto la terminal es un callejón: la única forma de
+         salir era cerrar sesión. --}}
+    @if($puedeVolverAlPanel)
+        <a href="{{ route('admin.dashboard') }}" wire:navigate
+           class="btn btn-touch admin-btn-secundario px-3">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span class="d-none d-lg-inline">Volver al Panel</span>
+        </a>
+    @endif
+
+    {{-- ============ AVISOS ============
+         Se ocultan solos a los pocos segundos y se colocan bajo la cabecera
+         centrados, para no taparle la tirilla al cajero. --}}
     @if($mensajeExito || $mensajeError)
-        <div class="pos-caja-aviso {{ $mensajeError ? 'error' : '' }}" wire:key="aviso-caja">
+        <div class="pos-caja-aviso {{ $mensajeError ? 'error' : '' }}"
+             wire:key="aviso-caja-{{ md5($mensajeError ?? $mensajeExito) }}"
+             x-data="{ visible: true }"
+             x-init="setTimeout(() => visible = false, 5000)"
+             x-show="visible"
+             x-transition.opacity>
             <i class="fa-solid {{ $mensajeError ? 'fa-triangle-exclamation' : 'fa-circle-check' }}"></i>
             <span>{{ $mensajeError ?? $mensajeExito }}</span>
         </div>

@@ -17,7 +17,7 @@
                     <span class="admin-metrica-texto">Base de apertura</span>
                 </div>
                 <div class="admin-metrica">
-                    <span class="admin-metrica-valor">${{ number_format($turnoAbierto->saldoEsperado(), 0, ',', '.') }}</span>
+                    <span class="admin-metrica-valor">${{ number_format($turnoAbierto->efectivoEsperado(), 0, ',', '.') }}</span>
                     <span class="admin-metrica-texto">Saldo esperado en cajón</span>
                 </div>
                 <div class="admin-metrica">

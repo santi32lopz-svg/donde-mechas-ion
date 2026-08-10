@@ -55,13 +55,60 @@ class TurnoCaja extends Model
     }
 
     /**
-     * Efectivo que debería haber en el cajón: la base, más lo vendido, menos
-     * los egresos registrados.
+     * Efectivo que debería haber en el cajón.
+     *
+     * Solo cuentan las ventas en efectivo: una venta con tarjeta o transferencia
+     * no mete un peso en el cajón, así que sumarla haría que el cierre nunca
+     * cuadrara. Este método sumaba todas las ventas y era un error.
      */
-    public function saldoEsperado(): float
+    public function efectivoEsperado(): float
     {
         return (float) $this->monto_apertura
-            + (float) $this->pedidos()->sum('monto_total')
-            - (float) $this->gastos()->sum('monto');
+            + $this->ventasEnEfectivo()
+            - $this->totalEgresos();
+    }
+
+    public function ventasEnEfectivo(): float
+    {
+        return (float) $this->pedidos()
+            ->where('estado', '!=', 'cancelado')
+            ->where('metodo_pago', 'efectivo')
+            ->sum('monto_total');
+    }
+
+    /**
+     * Todo lo vendido en el turno, cobrara como cobrara.
+     */
+    public function totalVendido(): float
+    {
+        return (float) $this->pedidos()
+            ->where('estado', '!=', 'cancelado')
+            ->sum('monto_total');
+    }
+
+    public function totalEgresos(): float
+    {
+        return (float) $this->gastos()->sum('monto');
+    }
+
+    /**
+     * Ventas agrupadas por método de pago, para el resumen del cierre.
+     *
+     * @return array<string, float>
+     */
+    public function ventasPorMetodo(): array
+    {
+        return $this->pedidos()
+            ->where('estado', '!=', 'cancelado')
+            ->selectRaw('metodo_pago, SUM(monto_total) as total')
+            ->groupBy('metodo_pago')
+            ->pluck('total', 'metodo_pago')
+            ->map(fn ($total) => (float) $total)
+            ->all();
+    }
+
+    public function cantidadDePedidos(): int
+    {
+        return $this->pedidos()->where('estado', '!=', 'cancelado')->count();
     }
 }

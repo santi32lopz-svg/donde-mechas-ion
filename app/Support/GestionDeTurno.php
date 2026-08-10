@@ -132,6 +132,6 @@ class GestionDeTurno
     {
         $turno = $this->abierto();
 
-        return $turno !== null && $monto > $turno->saldoEsperado();
+        return $turno !== null && $monto > $turno->efectivoEsperado();
     }
 }

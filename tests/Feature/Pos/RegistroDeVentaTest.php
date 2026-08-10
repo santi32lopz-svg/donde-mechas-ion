@@ -183,8 +183,43 @@ class RegistroDeVentaTest extends TestCase
         $pedido = Pedido::query()->withoutGlobalScope('negocio')->firstOrFail();
 
         $this->assertSame($turno->id, $pedido->turno_caja_id);
-        // Y el saldo esperado del cajón lo refleja.
-        $this->assertSame(117000.0, $turno->refresh()->saldoEsperado());
+        // Y el efectivo esperado del cajón lo refleja.
+        $this->assertSame(117000.0, $turno->refresh()->efectivoEsperado());
+    }
+
+    public function test_las_ventas_electronicas_no_entran_al_cajon(): void
+    {
+        // Un cobro con tarjeta o transferencia no mete un peso en el cajón.
+        // Sumarlo al efectivo esperado hacía que el cierre nunca cuadrara.
+        $turno = $this->abrirTurno();
+
+        Livewire::actingAs($this->cajero)
+            ->test(PosMain::class)
+            ->call('addToCart', $this->hamburguesa->id)
+            ->call('cobrar', 'tarjeta');
+
+        $turno->refresh();
+
+        $this->assertSame(100000.0, $turno->efectivoEsperado());
+        // Pero sí cuentan como venta del turno.
+        $this->assertSame(17000.0, $turno->totalVendido());
+        $this->assertSame(['tarjeta' => 17000.0], $turno->ventasPorMetodo());
+    }
+
+    public function test_el_efectivo_esperado_mezcla_ventas_y_egresos(): void
+    {
+        $turno = $this->abrirTurno();
+
+        Livewire::actingAs($this->cajero)
+            ->test(PosMain::class)
+            ->call('addToCart', $this->hamburguesa->id)
+            ->call('cobrar');
+
+        $this->actingAs($this->cajero);
+        app(\App\Support\GestionDeTurno::class)->registrarEgreso('Pago domiciliario', 20000);
+
+        // 100.000 de base + 17.000 en efectivo - 20.000 de salida.
+        $this->assertSame(97000.0, $turno->refresh()->efectivoEsperado());
     }
 
     // ------------------------------------------------------------------

@@ -173,7 +173,7 @@ class OperacionesDeCajaTest extends TestCase
             ->set('montoEgreso', '15000')
             ->call('registrarEgreso');
 
-        $this->assertSame(85000.0, $turno->refresh()->saldoEsperado());
+        $this->assertSame(85000.0, $turno->refresh()->efectivoEsperado());
     }
 
     public function test_un_egreso_puede_dejar_la_caja_en_negativo(): void
@@ -190,7 +190,7 @@ class OperacionesDeCajaTest extends TestCase
             ->call('registrarEgreso')
             ->assertHasNoErrors();
 
-        $this->assertSame(-40000.0, $turno->refresh()->saldoEsperado());
+        $this->assertSame(-40000.0, $turno->refresh()->efectivoEsperado());
     }
 
     public function test_se_avisa_antes_de_dejar_la_caja_en_negativo(): void
@@ -247,14 +247,22 @@ class OperacionesDeCajaTest extends TestCase
             ->assertSee('Abrir Caja');
     }
 
-    public function test_la_franja_muestra_la_base_cuando_hay_turno(): void
+    public function test_la_franja_muestra_el_efectivo_del_cajon(): void
     {
-        $this->abrirTurno($this->mechas, 120000);
+        // No la base con la que se abrió: mientras se vende lo que importa es
+        // cuánto dinero hay ahora en el cajón.
+        $turno = $this->abrirTurno($this->mechas, 120000);
 
         Livewire::actingAs($this->cajero)
             ->test(ControlDeCaja::class)
-            ->assertSee('CAJA ABIERTA')
-            ->assertSee('120.000');
+            ->call('abrirFormularioDeEgreso')
+            ->set('descripcionEgreso', 'Pago domiciliario')
+            ->set('montoEgreso', '20000')
+            ->call('registrarEgreso')
+            ->assertSee('EFECTIVO EN CAJA')
+            ->assertSee('100.000');
+
+        $this->assertSame(100000.0, $turno->refresh()->efectivoEsperado());
     }
 
     private function crearNegocio(string $nombre, string $slug): Negocio

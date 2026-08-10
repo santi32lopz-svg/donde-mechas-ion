@@ -1117,7 +1117,8 @@ body {
 .pos-caja-aviso {
     position: fixed;
     top: calc(var(--pos-header-height) + 12px);
-    right: 16px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 1080;
     display: flex;
     align-items: flex-start;

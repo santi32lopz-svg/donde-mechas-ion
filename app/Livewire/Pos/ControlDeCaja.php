@@ -4,6 +4,7 @@ namespace App\Livewire\Pos;
 
 use App\Exceptions\OperacionDeCajaNoPermitida;
 use App\Support\GestionDeTurno;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 /**
@@ -41,6 +42,17 @@ class ControlDeCaja extends Component
     public ?string $mensajeExito = null;
 
     public ?string $mensajeError = null;
+
+    /**
+     * PosMain avisa al cobrar. Sin esto la franja seguiría mostrando el
+     * efectivo de antes de la venta: los componentes hermanos no comparten
+     * ciclo de render.
+     */
+    #[On('venta-registrada')]
+    public function refrescar(): void
+    {
+        // El render posterior recalcula el efectivo esperado.
+    }
 
     // ------------------------------------------------------------------
     // Apertura de turno
@@ -165,12 +177,16 @@ class ControlDeCaja extends Component
 
         return view('livewire.pos.control-de-caja', [
             'turno' => $turno,
-            // Solo se calcula mientras el formulario de egreso está abierto:
-            // fuera de ese momento nadie necesita el saldo en esta pantalla.
+            // Dos agregados, y solo cuando este componente re-renderiza: por
+            // sus propias acciones o tras una venta. Los tecleos del buscador
+            // del POS no lo tocan, que es la razón de haberlo separado.
+            'efectivoEsperado' => $turno?->efectivoEsperado() ?? 0.0,
             'saldoNegativo' => $this->registrandoEgreso && $this->montoEgreso !== ''
                 ? $this->turnos()->dejariaSaldoNegativo((float) $this->montoEgreso)
                 : false,
             'tiposDeEgreso' => GestionDeTurno::TIPOS_DE_EGRESO,
+            'puedeVolverAlPanel' => auth()->user()?->rolEn($turno?->negocio_id
+                ?? app(\App\Support\TenantContext::class)->negocioId() ?? 0)?->administraNegocio() ?? false,
         ]);
     }
 }

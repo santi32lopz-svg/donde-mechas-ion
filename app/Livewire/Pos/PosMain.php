@@ -216,6 +216,11 @@ class PosMain extends Component
             number_format((float) $pedido->monto_total, 0, ',', '.'),
             $cambio > 0 ? ' Cambio: $'.number_format($cambio, 0, ',', '.').'.' : '',
         );
+
+        // ControlDeCaja es un componente hermano y no se entera solo de que
+        // aquí se cobró. Sin este aviso su franja mostraría el efectivo de
+        // antes de la venta, que es justo lo que el cajero necesita al día.
+        $this->dispatch('venta-registrada');
     }
 
     /**
